@@ -6,11 +6,9 @@ require('core-js/shim');
 var http = require('http');
 var BBPromise = require('bluebird');
 var express = require('express');
-var compression = require('compression');
 var bodyParser = require('body-parser');
 var fs = BBPromise.promisifyAll(require('fs'));
 var sUtil = require('./lib/util');
-var apiUtil = require('./lib/api-util');
 var packageInfo = require('./package.json');
 var yaml = require('js-yaml');
 
@@ -66,9 +64,6 @@ function initApp(options) {
         return item.trim();
     }).join('|') + ')$', 'i');
 
-    // set up the request templates for the APIs
-    apiUtil.setupApiTemplates(app);
-
     // set up the spec
     if(!app.conf.spec) {
         app.conf.spec = __dirname + '/spec.yaml';
@@ -122,8 +117,6 @@ function initApp(options) {
     app.set('x-powered-by', false);
     // disable the ETag header - users should provide them!
     app.set('etag', false);
-    // enable compression
-    app.use(compression({level: app.conf.compression_level}));
     // use the JSON body parser
     app.use(bodyParser.json());
     // use the application/x-www-form-urlencoded parser

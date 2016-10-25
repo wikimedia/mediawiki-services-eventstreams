@@ -9,7 +9,7 @@ worker_heap_limit_mb: 250
 
 # Logger info
 logging:
-  level: trace
+  level: info
   streams:
     - type: debug
 #  streams:
@@ -25,20 +25,31 @@ metrics:
   #port: 8125
 
 services:
-  - name: eventstream
+  - name: eventstreams
     # a relative path or the name of an npm package, if different from name
     module: ./app.js
     # optionally, a version constraint of the npm package
     # version: ^0.4.0
     # per-service config
     conf:
-      port: 6947
+      port: 8000
       # interface: localhost # uncomment to only listen on localhost
       # more per-service config settings
       # the location of the spec, defaults to spec.yaml if not specified
-      spec: ./spec.template.yaml
+      spec: ./spec.yaml
       # allow cross-domain requests to the API (default '*')
       cors: '*'
+
+      # Stream routes configuration.  Each key in this object will be a route path at
+      # /v1/stream/{stream_name}, and each stream config object should configure a list of
+      # topics to be included in that stream.
+      # This should match the /v1/stream/ routes configrued in spec.yaml.
+      streams:
+        test:
+          topics: [datacenter1.test.event]
+        revision-create:
+          topics: [datacenter1.mediawiki.revision-create]
+
       # kafka configs go here.
       kafka:
         metadata.broker.list: 'localhost:9092'

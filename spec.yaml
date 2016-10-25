@@ -1,0 +1,109 @@
+swagger: '2.0'
+info:
+  version: 0.0.1
+  title: WMF EventStreams
+  description: Streaming WMF event data over HTTP SSE / EventSource
+  termsOfService: https://wikimediafoundation.org/wiki/Terms_of_Use
+  license:
+    name: Apache2
+    url: http://www.apache.org/licenses/LICENSE-2.0
+paths:
+
+  # NOTE:  Each /v1/stream/ route you list here must also
+  # have a corresponding entry in the app config.yaml streams object that specifies
+  # the topics that belong to each of these streams.  If the streams config does not
+  # have an entry for this stream, it will not be configured as a real route, and requests
+  # to the route will 404.
+
+  /v1/stream/test:
+    get:
+      tags:
+        - test
+        - stream
+      description: >
+        test.event stream
+        https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/revision/create
+      produces:
+        - text/event-stream
+
+  /v1/stream/revision-create:
+    get:
+      tags:
+        - mediawiki
+        - revision
+        - stream
+      description: >
+        mediawiki.revision-create event stream
+        https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/revision/create
+      produces:
+        - text/event-stream
+
+  # TODO: Add more mediawiki event (and other) stream routes as needed.
+
+
+  # from routes/info.js
+  /_info:
+    get:
+      tags:
+        - Service information
+      description: Gets information about the service
+      produces:
+        - application/json
+      x-amples:
+        - title: retrieve service info
+          request: {}
+          response:
+            status: 200
+            headers:
+              content-type: application/json
+            body:
+              name: /.+/
+              description: /.+/
+              version: /.+/
+              home: /.+/
+  /_info/name:
+    get:
+      tags:
+        - Service information
+        - Service name
+      description: Gets the name of the service
+      produces:
+        - application/json
+      x-amples:
+        - title: retrieve service name
+          request: {}
+          response:
+            status: 200
+            headers:
+              content-type: application/json
+            body:
+              name: /.+/
+  /_info/version:
+    get:
+      tags:
+        - Service information
+        - Service version
+      description: Gets the running version of the service
+      produces:
+        - application/json
+      x-amples:
+        - title: retrieve service version
+          request: {}
+          response:
+            status: 200
+            headers:
+              content-type: application/json
+            body:
+              version: /.+/
+  /_info/home:
+    get:
+      tags:
+        - Service information
+        - Service homepage
+      description: Redirects to the home page
+      x-amples:
+        - title: redirect to the home page
+          request: {}
+          response:
+            status: 301
+

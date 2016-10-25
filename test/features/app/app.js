@@ -64,7 +64,7 @@ describe('express app', function() {
         });
     });
 
-    it('should get static content uncompressed', function() {
+    it.skip('should get static content uncompressed', function() {
         return preq.get({
             uri: server.config.uri + 'static/index.html',
             headers: {
