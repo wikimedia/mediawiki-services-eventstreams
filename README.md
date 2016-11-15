@@ -49,5 +49,4 @@ how `Last-Event-ID` works.
 
 
 ## TODO:
-- Use tagged and versioned kafka-sse in package.json
 - server side filtering
