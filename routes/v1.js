@@ -1,6 +1,5 @@
 'use strict';
 
-const _         = require('lodash');
 const kafkaSse  = require('kafka-sse');
 
 const sUtil = require('../lib/util');
@@ -23,7 +22,12 @@ let app;
  */
 function eventStream(req, res, topics) {
     return kafkaSse(req, res, topics, {
-        allowedTopics:          app.conf.allowed_topics,
+        // Using topics for allowedTopics may seem redundant, but it
+        // prevents requests for /stream/streamA from consuming from topics
+        // that are not configured for streamA by setting other topics
+        // in the Last-Event-ID header.  Last-Event-ID topic, partition, offset
+        // assignments will take precedence over topics parameter.
+        allowedTopics:          topics,
         // Give kafkaSse the request bunyan logger to use.
         logger:                 req.logger._logger,
         kafkaConfig:            app.conf.kafka,
@@ -40,13 +44,6 @@ module.exports = function(appObj) {
     app = appObj;
 
     const stream_names = Object.keys(app.conf.streams);
-
-    // kafka-sse will use allowed_topics to make sure it will never allow
-    // subscription to a topic not defined here.  We select all topics configured
-    // for each stream route.
-    app.conf.allowed_topics = _.uniq(_.flatten(
-        stream_names.map(stream => app.conf.streams[stream].topics)
-    ));
 
     // Create a new /v1/stream/${stream} route for each stream name.
     stream_names.forEach(stream => {
