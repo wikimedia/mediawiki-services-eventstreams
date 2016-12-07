@@ -42,6 +42,7 @@
     "service-runner": "^2.0.4",
     "swagger-router": "^0.4.6",
     "lodash": "^4.15.0",
+    "node-rdkafka-statsd": "^0.1.0",
     "kafka-sse": "git+https://phabricator.wikimedia.org/diffusion/WKSE/kafkasse.git#v0.0.5"
   },
   "devDependencies": {

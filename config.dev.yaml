@@ -20,9 +20,9 @@ logging:
 
 # Statsd metrics reporter
 metrics:
-  #type: log
-  #host: localhost
-  #port: 8125
+  type: log
+  host: localhost
+  port: 8125
 
 services:
   - name: eventstreams
@@ -53,3 +53,4 @@ services:
       # kafka configs go here.
       kafka:
         metadata.broker.list: 'localhost:9092'
+        statistics.interval.ms: 5000
