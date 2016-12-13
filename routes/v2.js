@@ -45,7 +45,7 @@ module.exports = function(appObj) {
 
     const stream_names = Object.keys(app.conf.streams);
 
-    // Create a new /v1/stream/${stream} route for each stream name.
+    // Create a new /stream/${stream} route for each stream name.
     stream_names.forEach(stream => {
         router.get(`/stream/${stream}`, (req, res) => {
             return eventStream(req, res, app.conf.streams[stream].topics);
@@ -53,7 +53,7 @@ module.exports = function(appObj) {
     });
 
     return {
-        path: '/v1',
+        path: '/v2',
         api_version: 1,
         skip_domain: true,
         router: router
