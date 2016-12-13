@@ -9,7 +9,7 @@ in the `streams` application config object.
 
 ## Routes
 
-### `GET /v1/stream/{stream_name}`
+### `GET /v2/stream/{stream_name}`
 
 `:stream` is configured in config.yaml.  Each key in the `streams` config object will be
 created as a route.  Each of these stream routes will consume from configured topics.  E.g.
@@ -22,8 +22,8 @@ streams:
     topics: [topicA]
 ```
 
-In this example, `/v1/streams/edits` and `/v1/streams/single-topic-stream` will be created as
-routes. Requests to `/v1/streams/edits` will consume from the topics `datacenter1.edit` and
+In this example, `/v2/streams/edits` and `/v2/streams/single-topic-stream` will be created as
+routes. Requests to `/v2/streams/edits` will consume from the topics `datacenter1.edit` and
 `datacenter2.edit`, and requests to `/v1/streams/single-topic-stream` will consume only from topic
 `topicA`.  As long as the `Last-Event-ID` header (see below) is not set, consumption will
 start from the latest position in each of these topics.
@@ -32,7 +32,7 @@ Requesting a specific stream name will return a never ending SSE stream to the c
 as SSE events.
 
 Note that `{stream_name}` is not a request parameter, but pseudo-code to indicate that
-there are multiple routes created under `/v1/stream/`.  These are each real routes, for
+there are multiple routes created under `/v2/stream/`.  These are each real routes, for
 which you should add proper entires to spec.yaml.
 
 
