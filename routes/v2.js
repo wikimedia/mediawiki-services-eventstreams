@@ -60,6 +60,10 @@ module.exports = function(appObj) {
     // Create a new /stream/${stream} route for each stream name.
     stream_names.forEach(stream => {
         router.get(`/stream/${stream}`, (req, res) => {
+            // This request is assumed to never end.  Increment
+            // a metric now that this stream has been requested.
+            app.metrics.increment(`req.stream.${stream}`);
+
             return eventStream(req, res, app.conf.streams[stream].topics);
         });
     });
