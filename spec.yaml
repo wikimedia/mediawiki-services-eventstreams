@@ -9,24 +9,22 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0
 paths:
 
-  # NOTE:  Each /v1/stream/ route you list here must also
+  # NOTE:  Each /v2/stream/ route you list here should also
   # have a corresponding entry in the app config.yaml streams object that specifies
-  # the topics that belong to each of these streams.  If the streams config does not
-  # have an entry for this stream, it will not be configured as a real route, and requests
-  # to the route will 404.
+  # the topics that belong to each of these streams.  In production, the swagger spec
+  # stream paths are dynamically populated during deployment based on the streams configuration.
 
-  /v1/stream/test:
+  /v2/stream/test:
     get:
       tags:
         - test
         - stream
       description: >
         test.event stream
-        https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/revision/create
       produces:
-        - text/event-stream
+        - text/event-stream; charset=utf8
 
-  /v1/stream/revision-create:
+  /v2/stream/revision-create:
     get:
       tags:
         - mediawiki
@@ -36,7 +34,19 @@ paths:
         mediawiki.revision-create event stream
         https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/revision/create
       produces:
-        - text/event-stream
+        - text/event-stream; charset=utf8
+
+  /v2/stream/recentchange:
+    get:
+      tags:
+        - mediawiki
+        - revision
+        - stream
+      description: >
+        mediawiki.recentchange event stream
+        https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/recentchange
+      produces:
+        - text/event-stream; charset=utf8
 
   # TODO: Add more mediawiki event (and other) stream routes as needed.
 

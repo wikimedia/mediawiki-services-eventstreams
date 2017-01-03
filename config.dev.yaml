@@ -41,14 +41,18 @@ services:
       cors: '*'
 
       # Stream routes configuration.  Each key in this object will be a route path at
-      # /v1/stream/{stream_name}, and each stream config object should configure a list of
+      # /v2/stream/{stream_name}, and each stream config object should configure a list of
       # topics to be included in that stream.
-      # This should match the /v1/stream/ routes configrued in spec.yaml.
+      # This should match the /v2/stream/ routes configrued in spec.yaml.
+      # In production, the stream routes in spec.yaml are dynamically generated
+      # from this config object.
       streams:
         test:
           topics: [datacenter1.test.event]
         revision-create:
           topics: [datacenter1.mediawiki.revision-create]
+        recentchange:
+          topics: [datacenter1.mediawiki.recentchange]
 
       # kafka configs go here.
       kafka:
