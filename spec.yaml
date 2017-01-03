@@ -22,7 +22,7 @@ paths:
       description: >
         test.event stream
       produces:
-        - text/event-stream; charset=utf8
+        - text/event-stream; charset=utf-8
 
   /v2/stream/revision-create:
     get:
@@ -34,7 +34,7 @@ paths:
         mediawiki.revision-create event stream
         https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/revision/create
       produces:
-        - text/event-stream; charset=utf8
+        - text/event-stream; charset=utf-8
 
   /v2/stream/recentchange:
     get:
@@ -46,7 +46,7 @@ paths:
         mediawiki.recentchange event stream
         https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/recentchange
       produces:
-        - text/event-stream; charset=utf8
+        - text/event-stream; charset=utf-8
 
   # TODO: Add more mediawiki event (and other) stream routes as needed.
 
