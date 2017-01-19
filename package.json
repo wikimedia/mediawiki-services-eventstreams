@@ -58,7 +58,7 @@
     "node": ">=4"
   },
   "deploy": {
-    "node": "4.6.0",
+    "node": "6.9.1",
     "target": "debian",
     "env": {
       "BUILD_LIBRDKAFKA": "0"
