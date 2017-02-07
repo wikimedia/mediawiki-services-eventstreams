@@ -17,7 +17,6 @@ const router = sUtil.router();
 let app;
 
 
-
 /**
  * kafkaSse function wrapper that uses app config and req logger.
  * This function only exists to DRY route creation below.
@@ -54,10 +53,10 @@ module.exports = function(appObj) {
 
     app = appObj;
 
-    const stream_names = Object.keys(app.conf.streams);
+    const streamNames = Object.keys(app.conf.streams);
 
     // Create a new /stream/${stream} route for each stream name.
-    stream_names.forEach(stream => {
+    streamNames.forEach((stream) => {
         router.get(`/stream/${stream}`, (req, res) => {
             // Increment the number of current connections for this stream.
             app.metrics.increment(`connections.stream.${stream}`);
@@ -72,7 +71,7 @@ module.exports = function(appObj) {
         path: '/v2',
         api_version: 1,
         skip_domain: true,
-        router: router
+        router
     };
 };
 
