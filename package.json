@@ -30,32 +30,31 @@
   },
   "homepage": "https://gerrit.wikimedia.org/r/#/admin/projects/mediawiki/services/eventstreams",
   "dependencies": {
-    "bluebird": "^3.4.1",
+    "bluebird": "^3.4.6",
     "body-parser": "^1.15.2",
-    "bunyan": "^1.8.1",
+    "bunyan": "^1.8.5",
     "cassandra-uuid": "^0.0.2",
     "core-js": "^2.4.1",
-    "domino": "^1.0.25",
+    "domino": "^1.0.27",
     "express": "^4.14.0",
-    "js-yaml": "^3.6.1",
     "preq": "^0.5.2",
-    "service-runner": "^2.0.4",
-    "swagger-router": "^0.4.6",
     "lodash": "^4.15.0",
     "node-rdkafka-statsd": "^0.1.0",
-    "kafka-sse": "git+https://phabricator.wikimedia.org/diffusion/WKSE/kafkasse.git#v0.0.6"
+    "kafka-sse": "git+https://phabricator.wikimedia.org/diffusion/WKSE/kafkasse.git#v0.0.6",
+    "js-yaml": "^3.7.0",
+    "service-runner": "^2.1.11",
+    "swagger-router": "^0.5.5"
   },
   "devDependencies": {
     "extend": "^3.0.0",
-    "istanbul": "^0.4.4",
-    "mocha": "^2.5.3",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.1.2",
     "mocha-jshint": "^2.3.1",
     "mocha-lcov-reporter": "^1.2.0",
-    "nsp": "^2.6.1",
+    "nsp": "^2.6.2",
+    "mocha-eslint":"^3.0.1",
+    "eslint-config-node-services": "^1.0.6",
     "bunyan-prettystream": "^0.1.3"
-  },
-  "engines": {
-    "node": ">=4"
   },
   "deploy": {
     "node": "6.9.1",
