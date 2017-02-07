@@ -39,11 +39,11 @@
     "express": "^4.14.0",
     "preq": "^0.5.2",
     "lodash": "^4.15.0",
-    "node-rdkafka-statsd": "^0.1.0",
-    "kafka-sse": "git+https://phabricator.wikimedia.org/diffusion/WKSE/kafkasse.git#v0.0.6",
     "js-yaml": "^3.7.0",
     "service-runner": "^2.1.11",
-    "swagger-router": "^0.5.5"
+    "swagger-router": "^0.5.5",
+    "node-rdkafka-statsd": "^0.1.0",
+    "kafka-sse": "git+https://phabricator.wikimedia.org/diffusion/WKSE/kafkasse.git#v0.0.6"
   },
   "devDependencies": {
     "extend": "^3.0.0",
