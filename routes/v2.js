@@ -1,10 +1,13 @@
 'use strict';
 
+const os = require('os');
 const kafkaSse = require('kafka-sse');
 const rdkafkaStatsd = require('node-rdkafka-statsd');
 
 const sUtil = require('../lib/util');
 const eUtil = require('../lib/eventstreams-util');
+
+const IntervalCounter = eUtil.IntervalCounter;
 
 /**
  * The main router object
@@ -51,25 +54,37 @@ function eventStream(req, res, topics) {
 
 module.exports = function(appObj) {
 
-    app = appObj;
+    app = appObj
 
-    const streamNames = Object.keys(app.conf.streams);
+    // Per-worker metrics will be prefixed with hostname.worker_id
+    const workerMetricPrefix = `${os.hostname()}.${app.conf.worker_id}`;
+    // This interval counter will be used to report the number of connected clients
+    // per stream for this worker every statistics_interval_ms.
+    const intervalCounter = new IntervalCounter(
+        app.metrics.timing.bind(app.metrics),
+        app.conf.statistics_interval_ms || 60000
+    );
 
     // Create a new /stream/${stream} route for each stream name.
+    const streamNames = Object.keys(app.conf.streams);
     streamNames.forEach((stream) => {
         router.get(`/stream/${stream}`, (req, res) => {
-            // Increment the number of current connections for this stream.
-            app.metrics.increment(`connections.stream.${stream}`);
+            // Increment the number of current connections for this stream using this key.
+            const streamMetricKey = `${workerMetricPrefix}.connections.stream.${stream}`;
+            intervalCounter.increment(streamMetricKey);
+
+            // Start the EventStream
             return eventStream(req, res, app.conf.streams[stream].topics)
+
             // After the connection is closed, decrement the number
             // of current connections for this stream.
-            .finally(app.metrics.decrement.bind(null, `connections.stream.${stream}`));
+            .finally(intervalCounter.decrement.bind(intervalCounter, streamMetricKey));
         });
     });
 
     return {
         path: '/v2',
-        api_version: 1,
+        api_version: 2,
         skip_domain: true,
         router
     };

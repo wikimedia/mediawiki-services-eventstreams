@@ -40,6 +40,8 @@ services:
       # allow cross-domain requests to the API (default '*')
       cors: '*'
 
+      # Send metrics about the number of open stream connections this often.
+      statistics_interval_ms: 5000
       # Stream routes configuration.  Each key in this object will be a route path at
       # /v2/stream/{stream_name}, and each stream config object should configure a list of
       # topics to be included in that stream.
