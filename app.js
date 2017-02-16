@@ -11,7 +11,7 @@ var fs = BBPromise.promisifyAll(require('fs'));
 var sUtil = require('./lib/util');
 var packageInfo = require('./package.json');
 var yaml = require('js-yaml');
-
+var SwaggerParser = require('swagger-parser');
 
 /**
  * Creates an express app and initialises it
@@ -177,6 +177,21 @@ function loadRoutes (app) {
 
 }
 
+/**
+ * Uses swagger-parser to dereference any $refs in the swagger spec.
+ * app.conf.spec will be modified to included the resolved references.
+ * @param {Application} app the application object to load routes into
+ * @returns {Promise} a promise resolving to the app object
+ */
+function dereferenceSwaggerSpec(app) {
+    // resolve any remote references in the spec using SwaggerParser
+    return SwaggerParser.dereference(app.conf.spec)
+    .then((spec_dereferenced) => {
+        app.conf.spec = spec_dereferenced;
+        return app;
+    });
+}
+
 
 /**
  * Creates and start the service's web server
@@ -222,6 +237,7 @@ module.exports = function(options) {
 
     return initApp(options)
     .then(loadRoutes)
+    .then(dereferenceSwaggerSpec)
     .then(function(app) {
         // serve static files from static/
         app.use('/static', express.static(__dirname + '/static'));
@@ -229,4 +245,3 @@ module.exports = function(options) {
     }).then(createServer);
 
 };
-

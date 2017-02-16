@@ -23,7 +23,7 @@
     "EventSource",
     "Kafka"
   ],
-  "author": "Wikimedia Service Team <services@wikimedia.org>",
+  "author": "Wikimedia Analytics Team <analytics@lists.wikimedia.org>",
   "contributors": [],
   "license": "Apache-2.0",
   "bugs": {
@@ -45,6 +45,7 @@
     "swagger-router": "^0.5.5",
     "swagger-ui": "git+https://github.com/wikimedia/swagger-ui#master",
     "node-rdkafka-statsd": "^0.1.0",
+    "swagger-parser": "^3.4.1",
     "kafka-sse": "git+https://phabricator.wikimedia.org/diffusion/WKSE/kafkasse.git#v0.0.6"
   },
   "devDependencies": {

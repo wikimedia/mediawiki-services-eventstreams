@@ -1,55 +1,74 @@
 swagger: '2.0'
 info:
-  version: 0.0.1
-  title: WMF EventStreams
-  description: Streaming WMF event data over HTTP SSE / EventSource
+  version: 0.0.2
+  title: Wikimedia EventStreams
+  description: Streaming Wikimedia event data over HTTP SSE / EventSource
   termsOfService: https://wikimediafoundation.org/wiki/Terms_of_Use
   license:
     name: Apache2
     url: http://www.apache.org/licenses/LICENSE-2.0
+externalDocs:
+  url: https://wikitech.wikimedia.org/wiki/EventStreams
+
+definitions:
+  Last-Event-ID:
+    name: Last-Event-ID
+    in: header
+    description: >
+      Specifies the Kafka topics, partitions and offsets from which to begin
+      streaming. You may not specify topics that are not configured
+      to be part of this stream endpoint.
+      Example: [{topic: datacenter1.topic, partition: 0, offset: 12345}, ...]
+    type: array
+
 paths:
 
   # NOTE:  Each /v2/stream/ route you list here should also
   # have a corresponding entry in the app config.yaml streams object that specifies
   # the topics that belong to each of these streams.  In production, the swagger spec
-  # stream paths are dynamically populated during deployment based on the streams configuration.
+  # stream paths are dynamically populated during deployment based on the streams configuration,
+  # and response schema $refs will point at local file paths into the mediawiki/event-schemas repository.
 
-  /v2/stream/test:
+  /v2/stream/recentchange:
     get:
       tags:
-        - test
-        - stream
+        - Streams
+      summary: mediawiki.recentchange
       description: >
-        test.event stream
+        Mediawiki RecentChanges feed.
+        Schema: https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/recentchange
+      parameters:
+        - "$ref": "#/definitions/Last-Event-ID"
       produces:
         - text/event-stream; charset=utf-8
 
   /v2/stream/revision-create:
     get:
       tags:
-        - mediawiki
-        - revision
-        - stream
+        - Streams
+      summary: mediawiki.revsion-create
       description: >
-        mediawiki.revision-create event stream
+        mediawiki.revision-create event
         https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/revision/create
+      parameters:
+        - "$ref": "#/definitions/Last-Event-ID"
       produces:
         - text/event-stream; charset=utf-8
 
-  /v2/stream/recentchange:
+  /v2/stream/test:
     get:
       tags:
-        - mediawiki
-        - revision
-        - stream
+        - Streams
+      summary: test.event
       description: >
-        mediawiki.recentchange event stream
-        https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/recentchange
+        Test event stream.
+        Schema: https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/test/event
+      parameters:
+        - "$ref": "#/definitions/Last-Event-ID"
       produces:
         - text/event-stream; charset=utf-8
 
   # TODO: Add more mediawiki event (and other) stream routes as needed.
-
 
   # from routes/info.js
   /_info:
@@ -75,7 +94,6 @@ paths:
     get:
       tags:
         - Service information
-        - Service name
       description: Gets the name of the service
       produces:
         - application/json
@@ -92,7 +110,6 @@ paths:
     get:
       tags:
         - Service information
-        - Service version
       description: Gets the running version of the service
       produces:
         - application/json
@@ -105,15 +122,3 @@ paths:
               content-type: application/json
             body:
               version: /.+/
-  /_info/home:
-    get:
-      tags:
-        - Service information
-        - Service homepage
-      description: Redirects to the home page
-      x-amples:
-        - title: redirect to the home page
-          request: {}
-          response:
-            status: 301
-
