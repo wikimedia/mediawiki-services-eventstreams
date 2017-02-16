@@ -54,7 +54,7 @@ function eventStream(req, res, topics) {
 
 module.exports = function(appObj) {
 
-    app = appObj
+    app = appObj;
 
     // Per-worker metrics will be prefixed with hostname.worker_id
     const workerMetricPrefix = `${os.hostname()}.${app.conf.worker_id}`;
@@ -89,4 +89,3 @@ module.exports = function(appObj) {
         router
     };
 };
-
