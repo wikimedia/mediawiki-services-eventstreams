@@ -5,9 +5,10 @@
   "main": "./app.js",
   "scripts": {
     "start": "service-runner",
-    "test": "mocha && nsp check",
+    "test": "PREQ_CONNECT_TIMEOUT=15 mocha && nsp check",
     "docker-start": "service-runner docker-start",
     "docker-test": "service-runner docker-test",
+    "test-build": "service-runner docker-test && service-runner build --deploy-repo --force",
     "coverage": "istanbul cover _mocha -- -R spec"
   },
   "repository": {
@@ -42,6 +43,7 @@
     "js-yaml": "^3.7.0",
     "service-runner": "^2.1.11",
     "swagger-router": "^0.5.5",
+    "swagger-ui": "git+https://github.com/wikimedia/swagger-ui#master",
     "node-rdkafka-statsd": "^0.1.0",
     "kafka-sse": "git+https://phabricator.wikimedia.org/diffusion/WKSE/kafkasse.git#v0.0.6"
   },

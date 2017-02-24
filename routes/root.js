@@ -2,6 +2,7 @@
 
 
 const sUtil = require('../lib/util');
+const swaggerUi = require('../lib/swagger-ui');
 
 
 /**
@@ -31,15 +32,17 @@ router.get('/robots.txt', (req, res) => {
 
 /**
  * GET /
- * Main entry point. Currently it only responds if the spec query
+ * Main entry point. Currently it only responds if the spec or doc query
  * parameter is given, otherwise lets the next middleware handle it
  */
 router.get('/', (req, res, next) => {
 
-    if (!{}.hasOwnProperty.call(req.query || {}, 'spec')) {
-        next();
-    } else {
+    if ({}.hasOwnProperty.call(req.query || {}, 'spec')) {
         res.json(app.conf.spec);
+    } else if ({}.hasOwnProperty.call(req.query || {}, 'doc')) {
+        return swaggerUi.processRequest(app, req, res);
+    } else {
+        next();
     }
 
 });
