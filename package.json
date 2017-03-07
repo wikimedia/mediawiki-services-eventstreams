@@ -46,7 +46,7 @@
     "swagger-ui": "git+https://github.com/wikimedia/swagger-ui#master",
     "node-rdkafka-statsd": "^0.1.0",
     "swagger-parser": "^3.4.1",
-    "kafka-sse": "git+https://phabricator.wikimedia.org/diffusion/WKSE/kafkasse.git#v0.0.6"
+    "kafka-sse": "git+https://phabricator.wikimedia.org/diffusion/WKSE/kafkasse.git#v0.1.0"
   },
   "devDependencies": {
     "extend": "^3.0.0",
