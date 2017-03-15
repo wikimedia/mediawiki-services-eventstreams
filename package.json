@@ -70,7 +70,7 @@
         {
           "repo_url": "https://apt.wikimedia.org/wikimedia",
           "release": "jessie-wikimedia",
-          "pool": "main",
+          "pool": "backports",
           "packages": [
             "librdkafka-dev"
           ]
