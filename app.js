@@ -177,6 +177,7 @@ function loadRoutes (app) {
 
 }
 
+
 /**
  * Uses swagger-parser to dereference any $refs in the swagger spec.
  * app.conf.spec will be modified to included the resolved references.
@@ -188,6 +189,12 @@ function dereferenceSwaggerSpec(app) {
     return SwaggerParser.dereference(app.conf.spec)
     .then((spec_dereferenced) => {
         app.conf.spec = spec_dereferenced;
+        return app;
+    })
+    // We don't want to die because of a swagger spec resolve problem,
+    // so just return app to continue on error.  (SwaggerParser.dereference
+    // will log the error.)
+    .catch((e) => {
         return app;
     });
 }

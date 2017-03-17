@@ -33,7 +33,7 @@ paths:
     get:
       tags:
         - Streams
-      summary: mediawiki.recentchange
+      summary: mediawiki/recentchange event
       description: >
         Mediawiki RecentChanges feed.
         Schema: https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/recentchange
@@ -41,12 +41,17 @@ paths:
         - "$ref": "#/definitions/Last-Event-ID"
       produces:
         - text/event-stream; charset=utf-8
+      responses:
+        default:
+          description: mediawiki/recentchange
+          schema:
+            "$ref": "http://localhost:8085/v1/schemas/mediawiki/revision/create"
 
   /v2/stream/revision-create:
     get:
       tags:
         - Streams
-      summary: mediawiki.revsion-create
+      summary: mediawiki/revsion/create event
       description: >
         mediawiki.revision-create event
         https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/revision/create
@@ -54,12 +59,17 @@ paths:
         - "$ref": "#/definitions/Last-Event-ID"
       produces:
         - text/event-stream; charset=utf-8
+      responses:
+        default:
+          description: mediawiki/revision/create
+          schema:
+            "$ref": "http://localhost:8085/v1/schemas/mediawiki/recentchange"
 
   /v2/stream/test:
     get:
       tags:
         - Streams
-      summary: test.event
+      summary: test/event event
       description: >
         Test event stream.
         Schema: https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/test/event
@@ -67,8 +77,39 @@ paths:
         - "$ref": "#/definitions/Last-Event-ID"
       produces:
         - text/event-stream; charset=utf-8
+      responses:
+        default:
+          description: test/event
+          schema:
+            "$ref": "http://localhost:8085/v1/schemas/test/event"
 
   # TODO: Add more mediawiki event (and other) stream routes as needed.
+
+
+  /v2/schema/{schema_uri}:
+    get:
+      tags:
+        - Schema
+      summary: Get a schema by its relative schema_uri
+      description: Returns the JSONSchema for the given relative schema_uri.
+      parameters:
+        - name: schema_uri
+          description: Relative schema_uri to an event JSONschema
+          in: path
+          required: true
+          type: string
+          default: mediawiki/recentchange
+      produces:
+        - application/json; charset=utf-8
+      x-amples:
+        - title: Get the mediawiki/recentchange schema
+          request:
+            params:
+              schema_uri: mediawiki/recentchange
+          response:
+            status: 200
+            headers:
+              content-type: application/json
 
   # from routes/info.js
   /_info:

@@ -267,10 +267,16 @@ describe('Swagger spec', function() {
     });
 
     // Skipped because SSE stream routes aren't testable with preq
-    xdescribe('routes', function() {
+    describe('routes', function() {
 
         constructTests(spec.paths, defParams).forEach(function(testCase) {
-            it(testCase.title, function() {
+            // skip all /v2/stream/* tests, as stream requests don't
+            // work with preq.  See: https://phabricator.wikimedia.org/T150439
+            let testItFunction = it;
+            if (testCase.title.startsWith('/v2/stream')) {
+                testItFunction = xit;
+            }
+            testItFunction(testCase.title, function() {
                 return preq(testCase.request)
                 .then(function(res) {
                     validateTestResponse(testCase, res);
@@ -283,4 +289,3 @@ describe('Swagger spec', function() {
     });
 
 });
-
