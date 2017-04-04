@@ -41,7 +41,7 @@
     "preq": "^0.5.2",
     "lodash": "^4.15.0",
     "js-yaml": "^3.7.0",
-    "service-runner": "^2.1.11",
+    "service-runner": "^2.2.5",
     "swagger-router": "^0.5.5",
     "swagger-ui": "git+https://github.com/wikimedia/swagger-ui#master",
     "node-rdkafka-statsd": "^0.1.0",
