@@ -42,7 +42,8 @@ router.get('/', (req, res, next) => {
     } else if ({}.hasOwnProperty.call(req.query || {}, 'doc')) {
         return swaggerUi.processRequest(app, req, res);
     } else {
-        next();
+        // Redirect / to documentation page
+        res.redirect(303, '/?doc')
     }
 
 });
