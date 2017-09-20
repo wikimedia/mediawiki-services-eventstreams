@@ -38,17 +38,7 @@ function eventStream(req, res, topics) {
         // Use the eventstreams custom deserializer to include
         // kafka message meta data in the deserialized message.meta object
         // that will be sent to the client as an event.
-        deserializer:           eUtil.deserializer,
-        kafkaEventHandlers: {
-            // Create a child of this app's metrics object to use
-            // for consumer specific rdkafka metric reporting via node-rdkafka-statsd.
-            // This will emit consumer specific metrics prefixed like:
-            // eventstreams.rdkafka.2807ee91-bcc0-11e6-9e1f-a1c84e764327.
-            'event.stats': rdkafkaStatsd(
-                app.metrics.makeChild(`rdkafka.${req.headers['x-request-id']}`),
-                { filterFn: eUtil.rdkafkaStatsFilter }
-            )
-        }
+        deserializer:           eUtil.deserializer
     });
 }
 
