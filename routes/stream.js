@@ -2,7 +2,6 @@
 
 const os = require('os');
 const kafkaSse = require('kafka-sse');
-const rdkafkaStatsd = require('node-rdkafka-statsd');
 
 const sUtil = require('../lib/util');
 const eUtil = require('../lib/eventstreams-util');
