@@ -1,6 +1,6 @@
 {
   "name": "eventstreams",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Streaming Wikimedia Events via HTTP SSE",
   "main": "./app.js",
   "scripts": {
@@ -77,7 +77,7 @@
         {
           "repo_url": "https://apt.wikimedia.org/wikimedia",
           "release": "jessie-wikimedia",
-          "pool": "backports",
+          "pool": "main",
           "packages": [
             "librdkafka-dev"
           ]
