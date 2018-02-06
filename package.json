@@ -48,7 +48,7 @@
     "http-shutdown": "^1.2.0",
     "node-rdkafka-statsd": "^0.1.0",
     "swagger-parser": "^3.4.1",
-    "kafka-sse": "git+https://phabricator.wikimedia.org/diffusion/WKSE/kafkasse.git#v0.1.0"
+    "kafka-sse": "git+https://phabricator.wikimedia.org/diffusion/WKSE/kafkasse.git#v0.1.1"
   },
   "devDependencies": {
     "ajv": "^5.5.0",
