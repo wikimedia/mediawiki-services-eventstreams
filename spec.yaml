@@ -29,6 +29,96 @@ paths:
   # stream paths are dynamically populated during deployment based on the streams configuration,
   # and response schema $refs will point at local file paths into the mediawiki/event-schemas repository.
 
+  /v2/stream/page-create:
+    get:
+      tags:
+        - Streams
+      summary: mediawiki/page/create event
+      description: >
+        mediawiki.page-create event
+        https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/page/create
+      parameters:
+        - "$ref": "#/definitions/Last-Event-ID"
+      produces:
+        - text/event-stream; charset=utf-8
+      responses:
+        default:
+          description: mediawiki/page/create
+          schema:
+            "$ref": "http://localhost:8092/v2/schema/mediawiki/page/create"
+
+  /v2/stream/page-delete:
+    get:
+      tags:
+        - Streams
+      summary: mediawiki/page/delete event
+      description: >
+        mediawiki.page-delete event
+        https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/page/delete
+      parameters:
+        - "$ref": "#/definitions/Last-Event-ID"
+      produces:
+        - text/event-stream; charset=utf-8
+      responses:
+        default:
+          description: mediawiki/page/delete
+          schema:
+            "$ref": "http://localhost:8092/v2/schema/mediawiki/page/delete"
+
+  /v2/stream/page-undelete:
+    get:
+      tags:
+        - Streams
+      summary: mediawiki/page/undelete event
+      description: >
+        mediawiki.page-undelete event
+        https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/page/undelete
+      parameters:
+        - "$ref": "#/definitions/Last-Event-ID"
+      produces:
+        - text/event-stream; charset=utf-8
+      responses:
+        default:
+          description: mediawiki/page/undelete
+          schema:
+            "$ref": "http://localhost:8092/v2/schema/mediawiki/page/undelete"
+
+  /v2/stream/page-properties-change:
+    get:
+      tags:
+        - Streams
+      summary: mediawiki/page/properties-change event
+      description: >
+        mediawiki.page-properties-change event
+        https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/page/properties-change
+      parameters:
+        - "$ref": "#/definitions/Last-Event-ID"
+      produces:
+        - text/event-stream; charset=utf-8
+      responses:
+        default:
+          description: mediawiki/page/properties-change
+          schema:
+            "$ref": "http://localhost:8092/v2/schema/mediawiki/page/properties-change"
+
+  /v2/stream/revision-create:
+    get:
+      tags:
+        - Streams
+      summary: mediawiki/revision/create event
+      description: >
+        mediawiki.revision-create event
+        https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/revision/create
+      parameters:
+        - "$ref": "#/definitions/Last-Event-ID"
+      produces:
+        - text/event-stream; charset=utf-8
+      responses:
+        default:
+          description: mediawiki/revision/create
+          schema:
+            "$ref": "http://localhost:8092/v2/schema/mediawiki/revision/create"
+
   /v2/stream/recentchange:
     get:
       tags:
@@ -45,25 +135,8 @@ paths:
         default:
           description: mediawiki/recentchange
           schema:
-            "$ref": "http://localhost:8085/v1/schemas/mediawiki/revision/create"
+            "$ref": "http://localhost:8092/v2/schema/mediawiki/recentchange"
 
-  /v2/stream/revision-create:
-    get:
-      tags:
-        - Streams
-      summary: mediawiki/revsion/create event
-      description: >
-        mediawiki.revision-create event
-        https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/revision/create
-      parameters:
-        - "$ref": "#/definitions/Last-Event-ID"
-      produces:
-        - text/event-stream; charset=utf-8
-      responses:
-        default:
-          description: mediawiki/revision/create
-          schema:
-            "$ref": "http://localhost:8085/v1/schemas/mediawiki/recentchange"
 
   /v2/stream/test:
     get:
@@ -81,7 +154,7 @@ paths:
         default:
           description: test/event
           schema:
-            "$ref": "http://localhost:8085/v1/schemas/test/event"
+            "$ref": "http://localhost:8092/v2/schema/test/event"
 
   # TODO: Add more mediawiki event (and other) stream routes as needed.
 

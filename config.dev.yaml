@@ -51,6 +51,16 @@ services:
       streams:
         test:
           topics: [datacenter1.test.event]
+        page-create:
+          topics: [datacenter1.mediawiki.page-create]
+        page-delete:
+          topics: [datacenter1.mediawiki.page-delete]
+        page-move:
+          topics: [datacenter1.mediawiki.page-move]
+        page-undelete:
+          topics: [datacenter1.mediawiki.page-undelete]
+        page-properties-change:
+          topics: [datacenter1.mediawiki.page-properties-change]
         revision-create:
           topics: [datacenter1.mediawiki.revision-create]
         recentchange:

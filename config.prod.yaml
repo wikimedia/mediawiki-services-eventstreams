@@ -49,6 +49,16 @@ services:
       streams:
         test:
           topics: [eqiad.test.event, codfw.test.event]
+        page-create:
+          topics: [eqiad.mediawiki.page-create, codfw.mediawiki.page-create]
+        page-delete:
+          topics: [eqiad.mediawiki.page-delete, codfw.mediawiki.page-delete]
+        page-move:
+          topics: [eqiad.mediawiki.page-move, codfw.mediawiki.page-move]
+        page-undelete:
+          topics: [eqiad.mediawiki.page-undelete, codfw.mediawiki.page-undelete]
+        page-properties-change:
+          topics: [eqiad.mediawiki.page-properties-change, codfw.mediawiki.page-properties-change]
         revision-create:
           topics: [eqiad.mediawiki.revision-create, codfw.mediawiki.revision-create]
         recentchange:
