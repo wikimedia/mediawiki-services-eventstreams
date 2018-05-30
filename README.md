@@ -9,10 +9,11 @@ in the `streams` application config object.
 
 ## Routes
 
-### `GET /v2/stream/{stream_name}`
+### `GET /v2/stream/{streams}`
 
-`:stream` is configured in config.yaml.  Each key in the `streams` config object will be
-created as a route.  Each of these stream routes will consume from configured topics.  E.g.
+Streams are configured in config.yaml.  Each key in the `streams` config object will allowed
+to be provided in the {streams} parameter.  {streams} is a comma separated list of streams names.
+Each of these stream routes will consume from configured topics.  E.g.
 
 ```yaml
 streams:
@@ -22,18 +23,18 @@ streams:
     topics: [topicA]
 ```
 
-In this example, `/v2/streams/edits` and `/v2/streams/single-topic-stream` will be created as
-routes. Requests to `/v2/streams/edits` will consume from the topics `datacenter1.edit` and
+In this example, `/v2/stream/edits` and `/v2/stream/single-topic-stream` would be valid requests.
+Requests to `/v2/stream/edits` will consume from the topics `datacenter1.edit` and
 `datacenter2.edit`, and requests to `/v1/streams/single-topic-stream` will consume only from topic
-`topicA`.  As long as the `Last-Event-ID` header (see below) is not set, consumption will
-start from the latest position in each of these topics.
+`topicA`. Multiple streams can be requested, by providing the stream names in a comma separated list,
+e.g. `/v2/stream/edits,single-topic-stream`.  As long as the `Last-Event-ID` header
+(see below) is not set, consumption will start from the latest position in each of these topics.
 
-Requesting a specific stream name will return a never ending SSE stream to the client.
-as SSE events.
+Requesting streams will return a never ending SSE stream to the client as SSE events.
 
-Note that `{stream_name}` is not a request parameter, but pseudo-code to indicate that
-there are multiple routes created under `/v2/stream/`.  These are each real routes, for
-which you should add proper entires to spec.yaml.
+When configuring new streams, you should also update spec.yaml to include the new streams.
+The parameter based /v2/stream/{streams} is the real route, but it is convenient to be able
+to read the API docs as if each individual stream was a real explicit route.
 
 
 ## Historical Consumption & Offsets
@@ -46,7 +47,3 @@ to auto-resume if they lose their connection to the EventStreams service.
 
 See the [KafkaSSE README](https://github.com/wikimedia/kafkasse#kafkasse) for more information on
 how `Last-Event-ID` works.
-
-
-## TODO:
-- server side filtering

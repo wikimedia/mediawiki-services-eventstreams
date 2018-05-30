@@ -1,6 +1,6 @@
 {
   "name": "eventstreams",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Streaming Wikimedia Events via HTTP SSE",
   "main": "./app.js",
   "scripts": {

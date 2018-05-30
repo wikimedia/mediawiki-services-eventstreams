@@ -23,6 +23,19 @@ definitions:
 
 paths:
 
+  /v2/stream/{streams}:
+    get:
+      tags:
+        - Streams
+      summary: Subscribe to one or multiple streams.
+      description: >
+        Use this route to subscribe to a comma separated list of configured streams.
+      parameters:
+        - "$ref": "#/definitions/Last-Event-ID"
+      produces:
+        - text/event-stream; charset=utf-8
+
+
   # NOTE:  Each /v2/stream/ route you list here should also
   # have a corresponding entry in the app config.yaml streams object that specifies
   # the topics that belong to each of these streams.  In production, the swagger spec
@@ -118,6 +131,24 @@ paths:
           description: mediawiki/revision/create
           schema:
             "$ref": "http://localhost:8092/v2/schema/mediawiki/revision/create"
+
+  /v2/stream/revision-score:
+    get:
+      tags:
+        - Streams
+      summary: mediawiki/revision/score event
+      description: >
+        mediawiki.revision-score event
+        https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/revision/score
+      parameters:
+        - "$ref": "#/definitions/Last-Event-ID"
+      produces:
+        - text/event-stream; charset=utf-8
+      responses:
+        default:
+          description: mediawiki/revision/score
+          schema:
+            "$ref": "http://localhost:8092/v2/schema/mediawiki/revision/score"
 
   /v2/stream/recentchange:
     get:
