@@ -56,6 +56,25 @@ module.exports = function(appObj) {
         // Get the list of topics that make up the requested streams.
         const topics = _.flatMap(streams, stream => app.conf.streams[stream].topics);
 
+        // If since param is provided, it will be used to consume from
+        // a point in time in the past, if Last-Event-ID doesn't already
+        // have assignments in it.
+        let atTimestamp = req.query.since;
+        // If not a milliseconds timestamp, attempt to parse it into one.
+        if (atTimestamp && isNaN(atTimestamp)) {
+            atTimestamp = Date.parse(atTimestamp);
+        }
+        // If atTimestamp is defined but is still not a number milliseconds timestamp,
+        // throw HTTPError.
+        if (atTimestamp !== undefined && isNaN(atTimestamp)) {
+            throw new HTTPError({
+                status: 400,
+                type: 'invalid_timestamp',
+                title: 'Invalid timestamp',
+                detail: `since timestamp is not a UTC milliseconds unix epoch and was not parseable: '${req.query.since}'`
+            });
+        }
+
         // Increment the number of current connections for these streams.
         streams.forEach((stream) => {
             // Increment the number of current connections for this stream using this key.
@@ -63,21 +82,24 @@ module.exports = function(appObj) {
         });
 
         // Start the SSE EventStream connection with topics.
-        return kafkaSse(req, res, topics, {
-            // Using topics for allowedTopics may seem redundant, but it
-            // prevents requests for /stream/streamA from consuming from topics
-            // that are not configured for streamA by setting other topics
-            // in the Last-Event-ID header.  Last-Event-ID topic, partition, offset
-            // assignments will take precedence over topics parameter.
-            allowedTopics:          topics,
-            // Give kafkaSse the request bunyan logger to use.
-            logger:                 req.logger._logger,
-            kafkaConfig:            app.conf.kafka,
-            // Use the eventstreams custom deserializer to include
-            // kafka message meta data in the deserialized message.meta object
-            // that will be sent to the client as an event.
-            deserializer:           eUtil.deserializer
-        })
+        return kafkaSse(req, res, topics,
+            {
+                // Using topics for allowedTopics may seem redundant, but it
+                // prevents requests for /stream/streamA from consuming from topics
+                // that are not configured for streamA by setting other topics
+                // in the Last-Event-ID header.  Last-Event-ID topic, partition, offset
+                // assignments will take precedence over topics parameter.
+                allowedTopics:          topics,
+                // Give kafkaSse the request bunyan logger to use.
+                logger:                 req.logger._logger,
+                kafkaConfig:            app.conf.kafka,
+                // Use the eventstreams custom deserializer to include
+                // kafka message meta data in the deserialized message.meta object
+                // that will be sent to the client as an event.
+                deserializer:           eUtil.deserializer
+            },
+            atTimestamp
+        )
         // After the connection is closed, decrement the number
         // of current connections for these streams.
         .finally(() => {

@@ -36,6 +36,13 @@ When configuring new streams, you should also update spec.yaml to include the ne
 The parameter based /v2/stream/{streams} is the real route, but it is convenient to be able
 to read the API docs as if each individual stream was a real explicit route.
 
+All /v2/stream/{streams} routes take a `timestamp` query parameter.  This parameter
+is expected to either be an integer milliseconds unix epoch timestamp in UTC, or
+a string parseable via `Data.parse()`.  If given, then the requested streams will
+be attempted to start from offsets that correspond (in Kafka) with the given timestamp.
+If Kafka does not have offsets for the timestamp in its index, then the stream will
+just begin from the end.
+
 
 ## Historical Consumption & Offsets
 If the `Last-Event-ID` request header is set (usually via EventSource), it will be used for
@@ -43,7 +50,11 @@ subscription assignments, instead of the given route's topics.  This header is u
 EventSource implementation on receipt of the `id` field in the SSE events.
 It should be an array of `{topic, partition, offsets}` objects.  Each of these will be used for
 subscription at a particular point in each topic.  This allows EventSources connections
-to auto-resume if they lose their connection to the EventStreams service.
+to auto-resume if they lose their connection to the EventStreams service.  If you need to
+specify different timestamps for each of the topic-partitions in your requested streams,
+you may choose to set the `timestamp` field in the Last-Event-ID object entry.  This will
+be used for that topic-partition to query Kafka for the offset associated with the timestamp.
+If no offset is found, the topic-partition assignment will begin from the end.
 
 See the [KafkaSSE README](https://github.com/wikimedia/kafkasse#kafkasse) for more information on
 how `Last-Event-ID` works.
