@@ -3,7 +3,6 @@
 const http = require('http');
 const BBPromise = require('bluebird');
 const express = require('express');
-const compression = require('compression');
 const bodyParser = require('body-parser');
 const fs = BBPromise.promisifyAll(require('fs'));
 const sUtil = require('./lib/util');
@@ -31,7 +30,6 @@ function initApp(options) {
     // ensure some sane defaults
     if (!app.conf.port) { app.conf.port = 8888; }
     if (!app.conf.interface) { app.conf.interface = '0.0.0.0'; }
-    if (app.conf.compression_level === undefined) { app.conf.compression_level = 3; }
     if (app.conf.cors === undefined) { app.conf.cors = '*'; }
     if (app.conf.csp === undefined) {
         // eslint-disable-next-line max-len
@@ -116,8 +114,6 @@ function initApp(options) {
     app.set('x-powered-by', false);
     // disable the ETag header - users should provide them!
     app.set('etag', false);
-    // enable compression
-    app.use(compression({ level: app.conf.compression_level }));
     // use the JSON body parser
     app.use(bodyParser.json());
     // use the application/x-www-form-urlencoded parser

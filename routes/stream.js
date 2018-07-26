@@ -2,6 +2,7 @@
 
 const os = require('os');
 const _ = require('lodash');
+const P = require('bluebird');
 const kafkaSse = require('kafka-sse');
 
 const sUtil = require('../lib/util');
@@ -82,7 +83,7 @@ module.exports = function(appObj) {
         });
 
         // Start the SSE EventStream connection with topics.
-        return kafkaSse(req, res, topics,
+        return P.try(() => kafkaSse(req, res, topics,
             {
                 // Using topics for allowedTopics may seem redundant, but it
                 // prevents requests for /stream/streamA from consuming from topics
@@ -99,10 +100,11 @@ module.exports = function(appObj) {
                 deserializer:           eUtil.deserializer
             },
             atTimestamp
-        )
+        ))
         // After the connection is closed, decrement the number
         // of current connections for these streams.
         .finally(() => {
+            app.logger.log('debug/stats', 'Decrementing counters');
             streams.forEach((stream) => {
                 intervalCounter.decrement(`${streamConnectionMetricPrefix}.${stream}`);
             });
