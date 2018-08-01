@@ -39,7 +39,7 @@
     "express": "^4.16.2",
     "http-shutdown": "^1.2.0",
     "js-yaml": "^3.10.0",
-    "kafka-sse": "git+https://phabricator.wikimedia.org/diffusion/WKSE/kafkasse.git#484b3b3",
+    "kafka-sse": "git+https://phabricator.wikimedia.org/diffusion/WKSE/kafkasse.git#eb4568b",
     "lodash": "^4.15.0",
     "node-rdkafka-statsd": "^0.1.0",
     "preq": "^0.5.3",
