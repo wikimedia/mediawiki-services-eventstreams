@@ -48,13 +48,16 @@ just begin from the end.
 If the `Last-Event-ID` request header is set (usually via EventSource), it will be used for
 subscription assignments, instead of the given route's topics.  This header is usually set by an
 EventSource implementation on receipt of the `id` field in the SSE events.
-It should be an array of `{topic, partition, offsets}` objects.  Each of these will be used for
-subscription at a particular point in each topic.  This allows EventSources connections
+It should be an array of `{topic, partition, timestamp}` objects.  Each of these will be
+used for subscription at a particular point in each topic.  This allows EventSources connections
 to auto-resume if they lose their connection to the EventStreams service.  If you need to
 specify different timestamps for each of the topic-partitions in your requested streams,
 you may choose to set the `timestamp` field in the Last-Event-ID object entry.  This will
 be used for that topic-partition to query Kafka for the offset associated with the timestamp.
 If no offset is found, the topic-partition assignment will begin from the end.
+
+`timestamp` is now used instead of `offset` by default in the Last-Event-ID in order to support
+multi datacenter Kafka clusters for better high availability of the EventStreams service.
 
 See the [KafkaSSE README](https://github.com/wikimedia/kafkasse#kafkasse) for more information on
 how `Last-Event-ID` works.
