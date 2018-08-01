@@ -91,6 +91,9 @@ module.exports = function(appObj) {
                 // in the Last-Event-ID header.  Last-Event-ID topic, partition, offset
                 // assignments will take precedence over topics parameter.
                 allowedTopics:          topics,
+                // Support multi DC Kafka clusters by using message timestamps
+                // in Last-Event-ID instead of offsets.
+                useTimestampForId:      true,
                 // Give kafkaSse the request bunyan logger to use.
                 logger:                 req.logger._logger,
                 kafkaConfig:            app.conf.kafka,
