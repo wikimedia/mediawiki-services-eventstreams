@@ -113,6 +113,25 @@ paths:
           schema:
             "$ref": "http://localhost:8092/v2/schema/mediawiki/page/undelete"
 
+  /v2/stream/page-links-change:
+    get:
+      tags:
+        - Streams
+      summary: mediawiki/page/links-change event
+      description: >
+        mediawiki.page-links-change event
+        https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/page/links-change
+      parameters:
+        - "$ref": "#/definitions/Last-Event-ID"
+        - "$ref": "#/definitions/since"
+      produces:
+        - text/event-stream; charset=utf-8
+      responses:
+        default:
+          description: mediawiki/page/links-change
+          schema:
+            "$ref": "http://localhost:8092/v2/schema/mediawiki/page/links-change"
+
   /v2/stream/page-properties-change:
     get:
       tags:
