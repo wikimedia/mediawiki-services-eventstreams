@@ -44,7 +44,7 @@
     "node-rdkafka": "2.3.4",
     "node-rdkafka-statsd": "^0.1.0",
     "preq": "^0.5.3",
-    "service-runner": "^2.6.3",
+    "service-runner": "^2.6.17",
     "swagger-parser": "^3.4.1",
     "swagger-router": "^0.7.1",
     "swagger-ui": "git+https://github.com/wikimedia/swagger-ui#master"
