@@ -72,6 +72,7 @@ module.exports = function(appObj) {
                 status: 400,
                 type: 'invalid_timestamp',
                 title: 'Invalid timestamp',
+                // eslint-disable-next-line max-len
                 detail: `since timestamp is not a UTC milliseconds unix epoch and was not parseable: '${req.query.since}'`
             });
         }

@@ -180,13 +180,13 @@ function loadRoutes(app) {
  * Uses swagger-parser to dereference any $refs in the swagger spec.
  * app.conf.spec will be modified to included the resolved references.
  * @param {Application} app the application object to load routes into
- * @returns {Promise} a promise resolving to the app object
+ * @return {Promise} a promise resolving to the app object
  */
 function dereferenceSwaggerSpec(app) {
     // resolve any remote references in the spec using SwaggerParser
     return SwaggerParser.dereference(app.conf.spec)
-    .then((spec_dereferenced) => {
-        app.conf.spec = spec_dereferenced;
+    .then((specDereferenced) => {
+        app.conf.spec = specDereferenced;
         return app;
     })
     // We don't want to die because of a swagger spec resolve problem,
