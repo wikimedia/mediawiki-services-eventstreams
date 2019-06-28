@@ -41,6 +41,17 @@ module.exports = function(appObj) {
 
 
     router.get('/stream/:streams', (req, res) => {
+
+        // Temporary hack to combat https://phabricator.wikimedia.org/T226808
+        if (req.headers['x-client-ip'] && req.headers['x-client-ip'] === '104.248.45.188') {
+            throw new HTTPError({
+                status: 429,
+                type: 'too_many_requests',
+                title: 'Too Many Concurrent Connections From Your Client IP',
+                detail: 'Your HTTP client is likely opening too many concurrent connections.'
+            });
+        }
+
         const streams = req.params.streams.split(',');
 
         // Ensure all requested streams are available.
