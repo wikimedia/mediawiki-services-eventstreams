@@ -1,6 +1,6 @@
-swagger: '2.0'
+openapi: 3.0.0
 info:
-  version: 0.4.0
+  version: 0.7.0
   title: WMF Node.JS Service Template
   description: A template for creating Node.JS services
   termsOfService: https://wikimediafoundation.org/wiki/Terms_of_Use
@@ -12,6 +12,7 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0
 x-default-params:
   domain: en.wikipedia.org
+
 paths:
   # from routes/root.js
   /robots.txt:
@@ -20,21 +21,34 @@ paths:
         - Root
         - Robots
       description: Gets robots.txt
+      responses:
+        200:
+          description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
       x-amples:
         - title: robots.txt check
           request: {}
           response:
             status: 200
-            headers:
-              user-agent: '*'
-              disallow: '/'
   /:
     get:
       tags:
         - Root
       description: The root service end-point
-      produces:
-        - application/json
+      responses:
+        200:
+          description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
       x-amples:
         - title: root with no query params
           request: {}
@@ -59,15 +73,82 @@ paths:
           response:
             status: 404
   # from routes/v1.js
-  /{domain}/v1/siteinfo{/prop}:
+  /{domain}/v1/siteinfo:
     get:
       tags:
         - Site info
         - MW API call
         - Example
       description: Calls the MW API siteinfo action and returns the response
-      produces:
-        - application/json
+      parameters:
+        - $ref: '#/components/parameters/domain'
+      responses:
+        200:
+          description: Success
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        504:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+      x-amples:
+        - title: site info for default domain
+          request: {}
+          response:
+            status: 200
+            headers:
+              content-type: application/json
+        - title: site info for a non-existent domain
+          request:
+            params:
+              domain: my.fake.domain
+          response:
+            status: 504
+            headers:
+              content-type: application/json
+  /{domain}/v1/siteinfo/{prop}:
+    get:
+      tags:
+        - Site info
+        - MW API call
+        - Example
+      description: Calls the MW API siteinfo action and returns the response
+      parameters:
+        - $ref: '#/components/parameters/domain'
+        - $ref: '#/components/parameters/prop'
+      responses:
+        200:
+          description: Success
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        504:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
       x-amples:
         - title: site info for default domain
           request: {}
@@ -107,9 +188,24 @@ paths:
         - Page content
         - Example
       description: Gets the HTML for the page with the given title
-      produces:
-        - text/html
-        - application/json
+      parameters:
+        - $ref: '#/components/parameters/domain'
+        - $ref: '#/components/parameters/title'
+      responses:
+        200:
+          description: OK
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
       x-amples:
         - title: get the Foobar page from en.wp.org
           request:
@@ -126,9 +222,24 @@ paths:
         - Lead section
         - Example
       description: Gets the lead-section HTML for the page with the given title
-      produces:
-        - text/html
-        - application/json
+      parameters:
+        - $ref: '#/components/parameters/domain'
+        - $ref: '#/components/parameters/title'
+      responses:
+        200:
+          description: OK
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
       x-amples:
         - title: get the lead section for Barack Obama
           request:
@@ -144,8 +255,9 @@ paths:
       tags:
         - Service information
       description: Gets information about the service
-      produces:
-        - application/json
+      responses:
+        200:
+          description: OK
       x-amples:
         - title: retrieve service info
           request: {}
@@ -164,8 +276,9 @@ paths:
         - Service information
         - Service name
       description: Gets the name of the service
-      produces:
-        - application/json
+      responses:
+        200:
+          description: OK
       x-amples:
         - title: retrieve service name
           request: {}
@@ -181,8 +294,9 @@ paths:
         - Service information
         - Service version
       description: Gets the running version of the service
-      produces:
-        - application/json
+      responses:
+        200:
+          description: OK
       x-amples:
         - title: retrieve service version
           request: {}
@@ -198,6 +312,9 @@ paths:
         - Service information
         - Service homepage
       description: Redirects to the home page
+      responses:
+        301:
+          description: Redirect
       x-amples:
         - title: redirect to the home page
           request: {}
@@ -211,8 +328,13 @@ paths:
         - Error
         - Internal error
       description: Generates an internal error due to a wrong array declaration
-      produces:
-        - application/json
+      responses:
+        500:
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
       x-amples:
         - title: wrong array declaration example
           request: {}
@@ -227,8 +349,13 @@ paths:
         - Error
         - Internal error
       description: Generates an internal error due to a non-existing file
-      produces:
-        - application/json
+      responses:
+        500:
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
       x-amples:
         - title: non-existing file example
           request: {}
@@ -243,8 +370,13 @@ paths:
         - Error
         - Internal error
       description: Generates an internal error due to a user-thrown error
-      produces:
-        - application/json
+      responses:
+        500:
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
       x-amples:
         - title: user error example
           request: {}
@@ -259,8 +391,13 @@ paths:
         - Error
         - Access denied
       description: Generates an access-denied error
-      produces:
-        - application/json
+      responses:
+        403:
+          description: Access Denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
       x-amples:
         - title: access denied error example
           request: {}
@@ -275,8 +412,13 @@ paths:
         - Error
         - Unauthorised access
       description: Generates an unauthorised error
-      produces:
-        - application/json
+      responses:
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
       x-amples:
         - title: unauthorised error example
           request: {}
@@ -284,3 +426,62 @@ paths:
             status: 401
             headers:
               content-type: application/json
+  /ex/req/uri/{uri}:
+    get:
+      tags:
+        - Example
+        - Request issuing
+      description: Issues a request to the given URI
+      responses:
+        200:
+          description: OK
+      x-amples:
+        - title: Get example home page
+          request:
+            params:
+              uri: 'http://www.example.com'
+
+components:
+  schemas:
+    # A https://tools.ietf.org/html/draft-nottingham-http-problem
+    problem:
+      required:
+        - type
+      properties:
+        status:
+          type: integer
+        type:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+        method:
+          type: string
+        uri:
+          type: string
+  parameters:
+    domain:
+      in: path
+      name: domain
+      required: true
+      schema:
+        type: string
+      description: |
+        Project domain for the requested data.
+    title:
+      in: path
+      name: title
+      required: true
+      schema:
+        type: string
+      description: |
+        Page title. Use underscores instead of spaces. Example: `Main_Page`
+    prop:
+      in: path
+      name: prop
+      required: true
+      schema:
+        type: string
+      description: |
+        Site info prop.

@@ -9,6 +9,8 @@ const server = require('../../utils/server.js');
 const URI    = require('swagger-router').URI;
 const yaml   = require('js-yaml');
 const fs     = require('fs');
+const OpenAPISchemaValidator = require('openapi-schema-validator').default;
+const validator = new OpenAPISchemaValidator({ version: 3 });
 
 if (!server.stopHookAdded) {
     server.stopHookAdded = true;
@@ -251,12 +253,19 @@ describe('Swagger spec', function() {
         });
     });
 
+    it('should expose valid OpenAPI spec', () => {
+        return preq.get({ uri: `${server.config.uri}?spec` })
+        .then((res) =>  {
+            assert.deepEqual({errors: []}, validator.validate(res.body), 'Spec must have no validation errors');
+        });
+    });
+
     it('spec validation', () => {
         if (spec['x-default-params']) {
             defParams = spec['x-default-params'];
         }
         // check the high-level attributes
-        ['info', 'swagger', 'paths'].forEach((prop) => {
+        ['info', 'openapi', 'paths'].forEach((prop) => {
             assert.deepEqual(!!spec[prop], true, `No ${prop} field present!`);
         });
         // no paths - no love

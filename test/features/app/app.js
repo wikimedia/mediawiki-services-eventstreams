@@ -16,14 +16,14 @@ describe('express app', function() {
 
     this.timeout(20000); // eslint-disable-line no-invalid-this
 
-    before(() => { return server.start(); });
+    before(() => server.start());
 
     it('should get robots.txt', () => {
         return preq.get({
             uri: `${server.config.uri}robots.txt`
         }).then((res) => {
             assert.deepEqual(res.status, 200);
-            assert.deepEqual(res.headers.disallow, '/');
+            assert.deepEqual(res.body, 'User-agent: *\nDisallow: /\n');
         });
     });
 
@@ -52,9 +52,11 @@ describe('express app', function() {
             assert.deepEqual(res.headers['x-xss-protection'], '1; mode=block');
             assert.deepEqual(res.headers['x-content-type-options'], 'nosniff');
             assert.deepEqual(res.headers['x-frame-options'], 'SAMEORIGIN');
-            assert.deepEqual(res.headers['content-security-policy'], 'default-src');
-            assert.deepEqual(res.headers['x-content-security-policy'], 'default-src');
-            assert.deepEqual(res.headers['x-webkit-csp'], 'default-src');
+            /* eslint-disable max-len */
+            assert.deepEqual(res.headers['content-security-policy'], 'default-src \'self\'; object-src \'none\'; media-src *; img-src *; style-src *; frame-ancestors \'self\'');
+            assert.deepEqual(res.headers['x-content-security-policy'], 'default-src \'self\'; object-src \'none\'; media-src *; img-src *; style-src *; frame-ancestors \'self\'');
+            assert.deepEqual(res.headers['x-webkit-csp'], 'default-src \'self\'; object-src \'none\'; media-src *; img-src *; style-src *; frame-ancestors \'self\'');
+            /* eslint-enable max-len */
         });
     });
 
@@ -65,8 +67,10 @@ describe('express app', function() {
                 'accept-encoding': 'gzip, deflate'
             }
         }).then((res) => {
-            // check that the response is gzip-ed
-            assert.deepEqual(res.headers['content-encoding'], 'gzip', 'Expected gzipped contents!');
+            assert.deepEqual(res.status, 200);
+            // if there is no content-length, the reponse was gzipped
+            assert.deepEqual(res.headers['content-length'], undefined,
+                'Did not expect the content-length header!');
         });
     });
 
@@ -77,8 +81,8 @@ describe('express app', function() {
                 'accept-encoding': ''
             }
         }).then((res) => {
-            // check that the response is gzip-ed
             const contentEncoding = res.headers['content-encoding'];
+            assert.deepEqual(res.status, 200);
             assert.deepEqual(contentEncoding, undefined, 'Did not expect gzipped contents!');
         });
     });
