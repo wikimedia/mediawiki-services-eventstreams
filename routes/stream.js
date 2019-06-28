@@ -31,6 +31,7 @@ module.exports = function(appObj) {
     const workerMetricPrefix = `${os.hostname()}.${app.conf.worker_id}`;
     // Per worker and stream connection metric prefix.
     const streamConnectionMetricPrefix = `${workerMetricPrefix}.connections.stream`;
+    const clientConnectionMetricPrefix = `${workerMetricPrefix}.connections.client_ip`;
 
     // This interval counter will be used to report the number of connected clients
     // per stream for this worker every statistics_interval_ms.
@@ -39,21 +40,32 @@ module.exports = function(appObj) {
         app.conf.statistics_interval_ms || 60000
     );
 
-
     router.get('/stream/:streams', (req, res) => {
+        let clientConnectionMetric;
+        // ensure the requesting client hasn't gone over the conncurrent connection limits.
+        if (app.conf.client_ip_connection_limit) {
+            if (!req.headers['x-client-ip']) {
+                throw new HTTPError({
+                    status: 400,
+                    type: 'bad_request',
+                    title: 'Missing Required X-Client-IP Header',
+                    detail: 'X-Client-IP is a required request header'
+                });
+            }
 
-        // Temporary hack to combat https://phabricator.wikimedia.org/T226808
-        if (req.headers['x-client-ip'] && req.headers['x-client-ip'] === '104.248.45.188') {
-            throw new HTTPError({
-                status: 429,
-                type: 'too_many_requests',
-                title: 'Too Many Concurrent Connections From Your Client IP',
-                detail: 'Your HTTP client is likely opening too many concurrent connections.'
-            });
+            clientConnectionMetric = `${clientConnectionMetricPrefix}.${req.headers['x-client-ip']}`;
+            const clientConnectionCount = intervalCounter.get(clientConnectionMetric) || 0;
+            if (clientConnectionCount >= app.conf.client_ip_connection_limit) {
+                throw new HTTPError({
+                    status: 429,
+                    type: 'too_many_requests',
+                    title: 'Too Many Concurrent Connections From Your Client IP',
+                    detail: 'Your HTTP client is likely opening too many concurrent connections.'
+                });
+            }
         }
 
         const streams = req.params.streams.split(',');
-
         // Ensure all requested streams are available.
         const invalidStreams = streams.filter(stream => !(stream in app.conf.streams));
         if (invalidStreams.length > 0) {
@@ -94,8 +106,22 @@ module.exports = function(appObj) {
             intervalCounter.increment(`${streamConnectionMetricPrefix}.${stream}`);
         });
 
+        // Increment the number of concurrent connections for configured client headers.
+        intervalCounter.increment(clientConnectionMetric);
+
+        // After the connection is closed, decrement the number
+        // of current connections for these streams.
+        res.on('close', () => {
+            app.logger.log('debug/stats', 'Decrementing counters');
+            streams.forEach((stream) => {
+                intervalCounter.decrement(`${streamConnectionMetricPrefix}.${stream}`);
+            });
+            // Decrement the number of concurrent connections for this client ip
+            intervalCounter.decrement(clientConnectionMetric);
+        });
+
         // Start the SSE EventStream connection with topics.
-        return P.try(() => kafkaSse(req, res, topics,
+        return kafkaSse(req, res, topics,
             {
                 // Using topics for allowedTopics may seem redundant, but it
                 // prevents requests for /stream/streamA from consuming from topics
@@ -115,15 +141,7 @@ module.exports = function(appObj) {
                 deserializer:           eUtil.deserializer
             },
             atTimestamp
-        ))
-        // After the connection is closed, decrement the number
-        // of current connections for these streams.
-        .finally(() => {
-            app.logger.log('debug/stats', 'Decrementing counters');
-            streams.forEach((stream) => {
-                intervalCounter.decrement(`${streamConnectionMetricPrefix}.${stream}`);
-            });
-        });
+        );
     });
 
     return {
