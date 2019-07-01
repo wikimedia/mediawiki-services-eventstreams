@@ -106,8 +106,10 @@ module.exports = function(appObj) {
             intervalCounter.increment(`${streamConnectionMetricPrefix}.${stream}`);
         });
 
-        // Increment the number of concurrent connections for configured client headers.
-        intervalCounter.increment(clientConnectionMetric);
+        if (clientConnectionMetric) {
+            // Increment the number of concurrent connections for configured client headers.
+            intervalCounter.increment(clientConnectionMetric);
+        }
 
         // After the connection is closed, decrement the number
         // of current connections for these streams.
@@ -116,8 +118,10 @@ module.exports = function(appObj) {
             streams.forEach((stream) => {
                 intervalCounter.decrement(`${streamConnectionMetricPrefix}.${stream}`);
             });
-            // Decrement the number of concurrent connections for this client ip
-            intervalCounter.decrement(clientConnectionMetric);
+            if (clientConnectionMetric) {
+                // Decrement the number of concurrent connections for this client ip
+                intervalCounter.decrement(clientConnectionMetric);
+            }
         });
 
         // Start the SSE EventStream connection with topics.
