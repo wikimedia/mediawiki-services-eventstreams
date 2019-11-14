@@ -22,5 +22,9 @@ rules:
     - off
   no-multi-spaces:
     - off
+  prefer-const:
+    - error
+  no-underscore-dangle:
+    - off  
   array-bracket-spacing:
     - off

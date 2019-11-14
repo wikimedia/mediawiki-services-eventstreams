@@ -2,9 +2,7 @@
 
 'use strict';
 
-
 const assert = require('assert');
-
 
 function deepEqual(result, expected, message) {
 
@@ -18,9 +16,10 @@ function deepEqual(result, expected, message) {
 
 }
 
-
 /**
  * Asserts whether the return status was as expected
+ * @param {Object} res
+ * @param {integer} expected
  */
 function status(res, expected) {
 
@@ -29,9 +28,10 @@ function status(res, expected) {
 
 }
 
-
 /**
  * Asserts whether content type was as expected
+ * @param {Object} res
+ * @param {string} expectedRegexString
  */
 function contentType(res, expectedRegexString) {
 
@@ -40,7 +40,6 @@ function contentType(res, expectedRegexString) {
         `Expected content-type to match ${expectedRegexString}, but was ${actual}`);
 
 }
-
 
 function isDeepEqual(result, expected, message) {
 
@@ -53,7 +52,6 @@ function isDeepEqual(result, expected, message) {
 
 }
 
-
 function notDeepEqual(result, expected, message) {
 
     try {
@@ -65,7 +63,6 @@ function notDeepEqual(result, expected, message) {
     }
 
 }
-
 
 function fails(promise, onRejected) {
 
@@ -86,7 +83,6 @@ function fails(promise, onRejected) {
 
 }
 
-
 module.exports.ok             = assert.ok;
 module.exports.fails          = fails;
 module.exports.deepEqual      = deepEqual;
@@ -94,4 +90,3 @@ module.exports.isDeepEqual    = isDeepEqual;
 module.exports.notDeepEqual   = notDeepEqual;
 module.exports.contentType    = contentType;
 module.exports.status         = status;
-

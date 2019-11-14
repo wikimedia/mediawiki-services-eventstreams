@@ -19,10 +19,10 @@ logging:
 #    port: 12201
 
 # Statsd metrics reporter
-metrics:
-  type: log
-  host: localhost
-  port: 8125
+# metrics:
+#   type: log
+#   host: localhost
+#   port: 8125
 
 services:
   - name: eventstreams
