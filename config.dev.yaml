@@ -72,12 +72,6 @@ services:
         recentchange:
           topics: [datacenter1.mediawiki.recentchange]
 
-      # If set, this will enable the /v2/schema/:schema_uri route.
-      # Schemas will be requested from this URI appended with /:schema_uri,
-      # and then cached locally and served to the requesting client.
-      # If not set, the /v2/schema/:schema_uri route will not be enabled.
-      schema_proxy_uri: http://localhost:8085/v1/schemas
-
       # kafka configs go here.
       kafka:
         metadata.broker.list: 'localhost:9092'
