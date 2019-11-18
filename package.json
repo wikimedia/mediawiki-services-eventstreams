@@ -47,7 +47,7 @@
     "uuid": "^3.3.2",
 
     "swagger-parser": "^3.4.1",
-    "kafka-sse": "git+https://github.com/wikimedia/KafkaSSE.git#22272bf",
+    "kafka-sse": "git+https://github.com/wikimedia/KafkaSSE.git#80f335c",
     "lodash": "^4.15.0",
     "node-rdkafka": "2.3.4",
     "node-rdkafka-statsd": "^0.1.0"
@@ -63,7 +63,6 @@
     "mocha.parallel": "^0.15.6",
     "nyc": "^14.1.1",
     "openapi-schema-validator": "^3.0.3",
-
     "bunyan-prettystream": "^0.1.3"
   },
   "deploy": {
