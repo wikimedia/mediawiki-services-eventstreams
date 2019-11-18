@@ -124,17 +124,6 @@ module.exports = function(appObj) {
             }
         });
 
-        // If application/json disable SSE formatting so only 
-        // JSON messages are sent in body; no SSE formattting is desired.
-        let disableSSEFormatting = false;
-        const responseHeaders = {};
-        if (_.has(req.headers, 'content-type')) {
-            responseHeaders['content-type'] = req.headers['content-type'];
-            if (responseHeaders['content-type'].startsWith('application/json')) {
-                disableSSEFormatting = true;
-            }
-        }
-
         // Start the SSE EventStream connection with topics.
         return kafkaSse(req, res, topics,
             {
@@ -153,9 +142,7 @@ module.exports = function(appObj) {
                 // Use the eventstreams custom deserializer to include
                 // kafka message meta data in the deserialized message.meta object
                 // that will be sent to the client as an event.
-                deserializer:           eUtil.deserializer,
-                headers:                responseHeaders,
-                disableSSEFormatting
+                deserializer:           eUtil.deserializer
             },
             atTimestamp
         );

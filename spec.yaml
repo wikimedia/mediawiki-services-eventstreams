@@ -79,4 +79,3 @@ paths:
 # have a corresponding entry in the app config.yaml streams object that specifies
 # the topics that belong to each of these streams. These stream routes
 # will be dynamically added to this service spec on services startup.
-
