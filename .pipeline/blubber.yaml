@@ -7,14 +7,17 @@ runs:
 
 variants:
   build:
-    base: docker-registry.wikimedia.org/nodejs-devel
+    base: docker-registry.wikimedia.org/nodejs10-devel
     copies: [local]
-    apt: { packages: [git, build-essential, python-pkgconfig] }
+    apt: { packages: [git, build-essential, python-pkgconfig, librdkafka-dev] }
     node: { requirements: [package.json] }
-    runs: { environment: { LINK: g++ } }
+    runs:
+      environment:
+        BUILD_LIBRDKAFKA: "0"
+        LINK: g++
   development:
     includes: [build]
-    apt: { packages: [ca-certificates] }
+    apt: { packages: [ca-certificates, librdkafka1, librdkafka++1, kafkacat, telnet, iputils-ping, procps, curl, vim] }
     entrypoint: [node, server.js]
   test:
     includes: [build]
@@ -25,5 +28,7 @@ variants:
     node: { env: production }
   production:
     copies: [prep]
+    apt: { packages: [ca-certificates, librdkafka1, librdkafka++1] }
     node: { env: production }
+    runs: { environment: { UV_THREADPOOL_SIZE: "128" } }
     entrypoint: [node, server.js]
