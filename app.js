@@ -80,21 +80,7 @@ function initApp(options) {
 // === EventStreams modification ===
             // Stream routes are configuered using app conf.
             // Add them to the spec dynamically on startup.
-            const streamSpec = {
-                'get': {
-                    'tags': ['Streams'],
-                    'parameters': [
-                        { '$ref': '#/components/parameters/Last-Event-ID' },
-                        { '$ref': '#/components/parameters/since' }
-                    ],
-                    'responses': {
-                        '200': {
-                            '$ref': '#/components/responses/200_success'
-                        }
-                    }
-                }
-            };
-
+            const streamSpec = app.conf.spec.paths['/v2/stream/{streams}'];
             _.forOwn(app.conf.streams, (streamConfig, streamName) => {
                 const streamPath = `/v2/stream/${streamName}`;
 

@@ -75,7 +75,7 @@ paths:
         '200':
           "$ref": "#/components/responses/200_success"
 
-# NOTE:  Each /v2/stream/ route you list here should also
-# have a corresponding entry in the app config.yaml streams object that specifies
-# the topics that belong to each of these streams. These stream routes
-# will be dynamically added to this service spec on services startup.
+# NOTE:  Specific /v2/stream/* routes are configured in the app config.yaml
+# streams object.  It should specify the topics that belong to each of these
+# streams. These stream routes will be dynamically added to this service
+# spec on services startup.
