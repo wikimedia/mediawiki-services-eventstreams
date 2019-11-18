@@ -10,29 +10,44 @@ info:
 externalDocs:
   url: https://wikitech.wikimedia.org/wiki/EventStreams
 
-definitions:
-  Last-Event-ID:
-    name: Last-Event-ID
-    in: header
-    description: >
-      Specifies the Kafka topics, partitions and offsets from which to begin
-      streaming. You may not specify topics that are not configured
-      to be part of this stream endpoint.
-      Example: [{topic: datacenter1.topic, partition: 0, offset: 12345}, ...]
-    type: array
-  since:
-    name: since
-    in: query
-    description: >
-      If given, this timestamp will be used as the historical starting position in
-      each the requested streams. since should either be an integer UTC milliseconds
-      unix epoch timestamp, or a string timestamp parseable by Date.parse().
-      If the timestamp given does not have any corresponding offsets, it will be ignored,
-      and the data will begin streaming from the latest position in the stream.
-      This parameter is ignored if Last-Event-ID is set with offsets (or timestamps)
-      for individual topic partition assignments, e.g. when resuming after a disconnect.
-      NOTE: Historical timestamp assignment is not supported indefinitely. Depending
-      on backend stream configuration, will likely be only one or a few weeks.
+components:
+  parameters:
+    Last-Event-ID:
+      name: Last-Event-ID
+      in: header
+      description: >
+        Specifies the Kafka topics, partitions and offsets from which to begin
+        streaming. You may not specify topics that are not configured
+        to be part of this stream endpoint.
+        Example: [{topic: datacenter1.topic, partition: 0, offset: 12345}, ...]
+      schema:
+        type: array
+        items:
+          type: object
+          properties:
+            topic:
+              type: string
+            partition:
+              type: integer
+            offset:
+              type: integer
+            timestamp:
+              type: string
+    since:
+      name: since
+      in: query
+      description: >
+        If given, this timestamp will be used as the historical starting position in
+        each the requested streams. since should either be an integer UTC milliseconds
+        unix epoch timestamp, or a string timestamp parseable by Date.parse().
+        If the timestamp given does not have any corresponding offsets, it will be ignored,
+        and the data will begin streaming from the latest position in the stream.
+        This parameter is ignored if Last-Event-ID is set with offsets (or timestamps)
+        for individual topic partition assignments, e.g. when resuming after a disconnect.
+        NOTE: Historical timestamp assignment is not supported indefinitely. Depending
+        on backend stream configuration, will likely be only one or a few weeks.
+      schema:
+        type: string
 
 paths:
 
@@ -44,113 +59,28 @@ paths:
       description: >
         Use this route to subscribe to a comma separated list of configured streams.
       parameters:
-        - "$ref": "#/definitions/Last-Event-ID"
-        - "$ref": "#/definitions/since"
-      produces:
-        - text/event-stream; charset=utf-8
-
-
-  # NOTE:  Each /v2/stream/ route you list here should also
-  # have a corresponding entry in the app config.yaml streams object that specifies
-  # the topics that belong to each of these streams.  In production, the swagger spec
-  # stream paths are dynamically populated during deployment based on the streams configuration,
-  # and response schema $refs will point at local file paths into the mediawiki/event-schemas repository.
-
-  /v2/stream/page-create:
-    get:
-      tags:
-        - Streams
-      summary: mediawiki/page/create event
-      description: >
-        mediawiki.page-create event
-        https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/page/create
-      parameters:
-        - "$ref": "#/definitions/Last-Event-ID"
-        - "$ref": "#/definitions/since"
-      produces:
-        - text/event-stream; charset=utf-8
+        - "$ref": "#/components/parameters/Last-Event-ID"
+        - "$ref": "#/components/parameters/since"
       responses:
-        default:
-          description: mediawiki/page/create
-          schema:
-            "$ref": "http://localhost:8092/v2/schema/mediawiki/page/create"
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+            text/event-stream:
+              schema:
+                type: string
 
-  /v2/stream/page-delete:
-    get:
-      tags:
-        - Streams
-      summary: mediawiki/page/delete event
-      description: >
-        mediawiki.page-delete event
-        https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/page/delete
-      parameters:
-        - "$ref": "#/definitions/Last-Event-ID"
-        - "$ref": "#/definitions/since"
-      produces:
-        - text/event-stream; charset=utf-8
-      responses:
-        default:
-          description: mediawiki/page/delete
-          schema:
-            "$ref": "http://localhost:8092/v2/schema/mediawiki/page/delete"
 
-  /v2/stream/page-undelete:
-    get:
-      tags:
-        - Streams
-      summary: mediawiki/page/undelete event
-      description: >
-        mediawiki.page-undelete event
-        https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/page/undelete
-      parameters:
-        - "$ref": "#/definitions/Last-Event-ID"
-        - "$ref": "#/definitions/since"
-      produces:
-        - text/event-stream; charset=utf-8
-      responses:
-        default:
-          description: mediawiki/page/undelete
-          schema:
-            "$ref": "http://localhost:8092/v2/schema/mediawiki/page/undelete"
+# NOTE:  Each /v2/stream/ route you list here should also
+# have a corresponding entry in the app config.yaml streams object that specifies
+# the topics that belong to each of these streams.  In production, the swagger spec
+# stream paths are dynamically populated during deployment based on the streams configuration,
+# and response schema $refs will point at local file paths into the mediawiki/event-schemas repository.
 
-  /v2/stream/page-links-change:
-    get:
-      tags:
-        - Streams
-      summary: mediawiki/page/links-change event
-      description: >
-        mediawiki.page-links-change event
-        https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/page/links-change
-      parameters:
-        - "$ref": "#/definitions/Last-Event-ID"
-        - "$ref": "#/definitions/since"
-      produces:
-        - text/event-stream; charset=utf-8
-      responses:
-        default:
-          description: mediawiki/page/links-change
-          schema:
-            "$ref": "http://localhost:8092/v2/schema/mediawiki/page/links-change"
-
-  /v2/stream/page-properties-change:
-    get:
-      tags:
-        - Streams
-      summary: mediawiki/page/properties-change event
-      description: >
-        mediawiki.page-properties-change event
-        https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/page/properties-change
-      parameters:
-        - "$ref": "#/definitions/Last-Event-ID"
-        - "$ref": "#/definitions/since"
-      produces:
-        - text/event-stream; charset=utf-8
-      responses:
-        default:
-          description: mediawiki/page/properties-change
-          schema:
-            "$ref": "http://localhost:8092/v2/schema/mediawiki/page/properties-change"
-
+  # Example spec documentation for a stream.
+  # Add one for each stream you expose in production.
   /v2/stream/revision-create:
     get:
       tags:
@@ -160,151 +90,15 @@ paths:
         mediawiki.revision-create event
         https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/revision/create
       parameters:
-        - "$ref": "#/definitions/Last-Event-ID"
-        - "$ref": "#/definitions/since"
-      produces:
-        - text/event-stream; charset=utf-8
+        - "$ref": "#/components/parameters/Last-Event-ID"
+        - "$ref": "#/components/parameters/since"
       responses:
-        default:
-          description: mediawiki/revision/create
-          schema:
-            "$ref": "http://localhost:8092/v2/schema/mediawiki/revision/create"
-
-  /v2/stream/revision-score:
-    get:
-      tags:
-        - Streams
-      summary: mediawiki/revision/score event
-      description: >
-        mediawiki.revision-score event
-        https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/revision/score
-      parameters:
-        - "$ref": "#/definitions/Last-Event-ID"
-        - "$ref": "#/definitions/since"
-      produces:
-        - text/event-stream; charset=utf-8
-      responses:
-        default:
-          description: mediawiki/revision/score
-          schema:
-            "$ref": "http://localhost:8092/v2/schema/mediawiki/revision/score"
-
-  /v2/stream/recentchange:
-    get:
-      tags:
-        - Streams
-      summary: mediawiki/recentchange event
-      description: >
-        Mediawiki RecentChanges feed.
-        Schema: https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/recentchange
-      parameters:
-        - "$ref": "#/definitions/Last-Event-ID"
-        - "$ref": "#/definitions/since"
-      produces:
-        - text/event-stream; charset=utf-8
-      responses:
-        default:
-          description: mediawiki/recentchange
-          schema:
-            "$ref": "http://localhost:8092/v2/schema/mediawiki/recentchange"
-
-
-  /v2/stream/test:
-    get:
-      tags:
-        - Streams
-      summary: test/event event
-      description: >
-        Test event stream.
-        Schema: https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/test/event
-      parameters:
-        - "$ref": "#/definitions/Last-Event-ID"
-        - "$ref": "#/definitions/since"
-      produces:
-        - text/event-stream; charset=utf-8
-      responses:
-        default:
-          description: test/event
-          schema:
-            "$ref": "http://localhost:8092/v2/schema/test/event"
-
-  # TODO: Add more mediawiki event (and other) stream routes as needed.
-
-
-  /v2/schema/{schema_uri}:
-    get:
-      tags:
-        - Schema
-      summary: Get a schema by its relative schema_uri
-      description: Returns the JSONSchema for the given relative schema_uri.
-      parameters:
-        - name: schema_uri
-          description: Relative schema_uri to an event JSONschema
-          in: path
-          required: true
-          type: string
-          default: mediawiki/recentchange
-      produces:
-        - application/json; charset=utf-8
-      x-amples:
-        - title: Get the mediawiki/recentchange schema
-          request:
-            params:
-              schema_uri: mediawiki/recentchange
-          response:
-            status: 200
-            headers:
-              content-type: application/json
-
-  # from routes/info.js
-  /_info:
-    get:
-      tags:
-        - Service information
-      description: Gets information about the service
-      produces:
-        - application/json
-      x-amples:
-        - title: retrieve service info
-          request: {}
-          response:
-            status: 200
-            headers:
-              content-type: application/json
-            body:
-              name: /.+/
-              description: /.+/
-              version: /.+/
-              home: /.+/
-  /_info/name:
-    get:
-      tags:
-        - Service information
-      description: Gets the name of the service
-      produces:
-        - application/json
-      x-amples:
-        - title: retrieve service name
-          request: {}
-          response:
-            status: 200
-            headers:
-              content-type: application/json
-            body:
-              name: /.+/
-  /_info/version:
-    get:
-      tags:
-        - Service information
-      description: Gets the running version of the service
-      produces:
-        - application/json
-      x-amples:
-        - title: retrieve service version
-          request: {}
-          response:
-            status: 200
-            headers:
-              content-type: application/json
-            body:
-              version: /.+/
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "http://localhost:8092/v2/schema/mediawiki/revision/create"
+            text/event-stream:
+              schema:
+                type: string
