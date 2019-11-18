@@ -14,6 +14,10 @@ const path = require('path');
 
 const SwaggerParser = require('swagger-parser');
 
+// === EventStreams modification ===
+const _ = require('lodash');
+// === End EventStreams modification ===
+
 /**
  * Creates an express app and initialises it
  * @param {Object} options the options to initialise the app with
@@ -73,9 +77,41 @@ function initApp(options) {
     if (app.conf.spec.constructor !== Object) {
         try {
             app.conf.spec = yaml.safeLoad(fs.readFileSync(app.conf.spec));
+// === EventStreams modification ===
+            // Stream routes are configuered using app conf.
+            // Add them to the spec dynamically on startup.
+            const streamSpec = {
+                'get': {
+                    'tags': ['Streams'],
+                    'parameters': [
+                        { '$ref': '#/components/parameters/Last-Event-ID' },
+                        { '$ref': '#/components/parameters/since' }
+                    ],
+                    'responses': {
+                        '200': {
+                            '$ref': '#/components/responses/200_success'
+                        }
+                    }
+                }
+            };
+
+            _.forOwn(app.conf.streams, (streamConfig, streamName) => {
+                const streamPath = `/v2/stream/${streamName}`;
+
+                app.conf.spec.paths[streamPath] = _.cloneDeep(streamSpec);
+
+                app.conf.spec.paths[streamPath]['get']['description'] =
+                    streamConfig.description ||
+                    `${streamName} stream`;
+
+                app.conf.spec.paths[streamPath]['get']['summary'] =
+                    streamConfig.summary ||
+                    `${streamName} stream`;
+            })
+// === End EventStreams modification ===
+
         } catch (e) {
             app.logger.log('warn/spec', `Could not load the spec: ${e}`);
-            app.conf.spec = {};
         }
     }
     if (!app.conf.spec.openapi) {

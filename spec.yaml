@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 0.2.0
+  version: 0.3.0
   title: Wikimedia EventStreams
   description: Streaming Wikimedia event data over HTTP SSE / EventSource
   termsOfService: https://wikimediafoundation.org/wiki/Terms_of_Use
@@ -48,6 +48,16 @@ components:
         on backend stream configuration, will likely be only one or a few weeks.
       schema:
         type: string
+  responses:
+    200_success:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+        text/event-stream:
+          schema:
+            type: string
 
 paths:
 
@@ -63,42 +73,10 @@ paths:
         - "$ref": "#/components/parameters/since"
       responses:
         '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-            text/event-stream:
-              schema:
-                type: string
-
+          "$ref": "#/components/responses/200_success"
 
 # NOTE:  Each /v2/stream/ route you list here should also
 # have a corresponding entry in the app config.yaml streams object that specifies
-# the topics that belong to each of these streams.  In production, the swagger spec
-# stream paths are dynamically populated during deployment based on the streams configuration,
-# and response schema $refs will point at local file paths into the mediawiki/event-schemas repository.
+# the topics that belong to each of these streams. These stream routes
+# will be dynamically added to this service spec on services startup.
 
-  # Example spec documentation for a stream.
-  # Add one for each stream you expose in production.
-  /v2/stream/revision-create:
-    get:
-      tags:
-        - Streams
-      summary: mediawiki/revision/create event
-      description: >
-        mediawiki.revision-create event
-        https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/mediawiki/revision/create
-      parameters:
-        - "$ref": "#/components/parameters/Last-Event-ID"
-        - "$ref": "#/components/parameters/since"
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                "$ref": "http://localhost:8092/v2/schema/mediawiki/revision/create"
-            text/event-stream:
-              schema:
-                type: string

@@ -56,6 +56,7 @@ services:
       # from this config object.
       streams:
         test:
+          description: "Test event stream. Schema: https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/test/event"
           topics: [datacenter1.test.event]
         page-create:
           topics: [datacenter1.mediawiki.page-create]
