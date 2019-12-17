@@ -79,5 +79,6 @@ describe('IntervalCounter', function() {
         assert.throws(() => {
             intervalCounter.increment(null, 9);
         });
+        intervalCounter._stop();
     });
 });

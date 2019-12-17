@@ -276,7 +276,7 @@ describe('Swagger spec', function () {
                     // work with preq.  See: https://phabricator.wikimedia.org/T150439
                     let testItFunction = it;
                     if (testCase.title.startsWith('/v2/stream')) {
-                        testItFunction = xit;
+                        testItFunction = it.skip;
                     }
                     testItFunction(testCase.title, function (done) {
 // === End EventStreams modification ===

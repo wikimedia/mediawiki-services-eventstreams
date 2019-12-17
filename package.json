@@ -5,7 +5,7 @@
   "main": "./app.js",
   "scripts": {
     "start": "service-runner",
-    "test": "PREQ_CONNECT_TIMEOUT=15 mocha && nsp check",
+    "test": "PREQ_CONNECT_TIMEOUT=15 mocha",
     "lint": "eslint --cache --max-warnings 0 --ext .js --ext .json .",
     "docker-start": "service-runner docker-start",
     "docker-test": "service-runner docker-test",
