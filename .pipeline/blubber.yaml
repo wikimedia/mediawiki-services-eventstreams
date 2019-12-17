@@ -1,5 +1,5 @@
 version: v4
-base: docker-registry.wikimedia.org/nodejs-slim
+base: docker-registry.wikimedia.org/nodejs10-slim
 lives:
   in: /srv/service
 runs:
