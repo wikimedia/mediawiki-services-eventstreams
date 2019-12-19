@@ -56,7 +56,7 @@ describe('express app', function () {
 
 // === EventStreams modification ===
     it.skip('should get static content gzipped', () => {
-// === EventStreams modification ===
+// === End EventStreams modification ===
         return preq.get({
             uri: `${server.config.uri}static/index.html`,
             headers: {
@@ -72,7 +72,7 @@ describe('express app', function () {
 
 // === EventStreams modification ===
     it.skip('should get static content uncompressed', () => {
-// === EventStreams modification ===
+// === End EventStreams modification ===
         return preq.get({
             uri: `${server.config.uri}static/index.html`,
             headers: {

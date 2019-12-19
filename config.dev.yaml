@@ -18,11 +18,9 @@ logging:
 #    host: logstash1003.eqiad.wmnet
 #    port: 12201
 
-# Statsd metrics reporter
-# metrics:
-#   type: log
-#   host: localhost
-#   port: 8125
+metrics:
+  - type: prometheus
+    port: 9102
 
 services:
   - name: eventstreams
@@ -44,10 +42,8 @@ services:
       # expected to be long lived, so we can't use typical
       # connections per second type ratelimiting.  Instead,
       # we limit the number of connections per X-Client-IP.
-      client_ip_connection_limit: 2
+      # client_ip_connection_limit: 2
 
-      # Send metrics about the number of open stream connections this often.
-      statistics_interval_ms: 5000
       # Stream routes configuration.  Each key in this object will be a route path at
       # /v2/stream/{stream_name}, and each stream config object should configure a list of
       # topics to be included in that stream.

@@ -18,9 +18,8 @@ logging:
 
 # Statsd metrics reporter
 metrics:
-  type: statsd
-  host: statsd.eqiad.wmnet
-  port: 8125
+  - type: prometheus
+    port: 9102
 
 services:
   - name: eventstreams
@@ -44,8 +43,6 @@ services:
       # we limit the number of connections per X-Client-IP.
       client_ip_connection_limit: 2
 
-      # Send metrics about the number of open stream connections this often.
-      statistics_interval_ms: 60000
       # Stream routes configuration.  Each key in this object will be a route path at
       # /v2/stream/{stream_name}, and each stream config object should configure a list of
       # topics to be included in that stream.

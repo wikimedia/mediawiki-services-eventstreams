@@ -27,22 +27,28 @@ module.exports = function(appObj) {
 
     app = appObj;
 
-    // Per-worker metrics will be prefixed with hostname.worker_id
-    const workerMetricPrefix = `${os.hostname()}.${app.conf.worker_id}`;
-    // Per worker and stream connection metric prefix.
-    const streamConnectionMetricPrefix = `${workerMetricPrefix}.connections.stream`;
-    const clientConnectionMetricPrefix = `${workerMetricPrefix}.connections.client_ip`;
+    // Connected clients per stream and client IP service-runner metric.
+    const connectedClientsMetric = app.metrics.makeMetric({
+        type: 'Gauge',
+        name: `connected-clients`,
+        prometheus: {
+            name: 'eventstreams_connected_clients',
+            help: 'Connected clients per stream',
+            staticLabels: { service: app.metrics.getServiceName() },
+        },
+        labels: {
+            names: ['stream', 'client_ip'],
+            omitLabelNames: true,
+        }
+    });
 
-    // This interval counter will be used to report the number of connected clients
-    // per stream for this worker every statistics_interval_ms.
-    const intervalCounter = new IntervalCounter(
-        app.metrics.timing.bind(app.metrics),
-        app.conf.statistics_interval_ms || 60000
-    );
+    // Keep track of currently connected client IPs for poor-man's rate limiting.
+    const connectionCountPerIp = {};
 
     router.get('/stream/:streams', (req, res) => {
-        let clientConnectionMetric;
-        // ensure the requesting client hasn't gone over the conncurrent connection limits.
+        const clientIp = req.headers['x-client-ip'] || 'UNKNOWN';
+
+        // ensure the requesting client hasn't gone over the concurrent connection limits.
         if (app.conf.client_ip_connection_limit) {
             if (!req.headers['x-client-ip']) {
                 throw new HTTPError({
@@ -53,9 +59,8 @@ module.exports = function(appObj) {
                 });
             }
 
-            clientConnectionMetric = `${clientConnectionMetricPrefix}.${req.headers['x-client-ip']}`;
-            const clientConnectionCount = intervalCounter.get(clientConnectionMetric) || 0;
-            if (clientConnectionCount >= app.conf.client_ip_connection_limit) {
+            const clientIpConnectionCount = connectionCountPerIp[clientIp] || 0;
+            if (clientIpConnectionCount >= app.conf.client_ip_connection_limit) {
                 throw new HTTPError({
                     status: 429,
                     type: 'too_many_requests',
@@ -103,26 +108,27 @@ module.exports = function(appObj) {
         // Increment the number of current connections for these streams.
         streams.forEach((stream) => {
             // Increment the number of current connections for this stream using this key.
-            intervalCounter.increment(`${streamConnectionMetricPrefix}.${stream}`);
+            connectedClientsMetric.increment(1, [stream, clientIp]);
         });
-
-        if (clientConnectionMetric) {
-            // Increment the number of concurrent connections for configured client headers.
-            intervalCounter.increment(clientConnectionMetric);
-        }
+        // Increment the number of connctions for this clientIp
+        connectionCountPerIp[clientIp] = (connectionCountPerIp[clientIp] || 0) + 1;
 
         // After the connection is closed, decrement the number
         // of current connections for these streams.
-        res.on('close', () => {
-            app.logger.log('debug/stats', 'Decrementing counters');
+        function decrementConnectionCount() {
+            app.logger.log('debug/stats', `Decrementing connection counters for ${clientIp}`);
             streams.forEach((stream) => {
-                intervalCounter.decrement(`${streamConnectionMetricPrefix}.${stream}`);
+                connectedClientsMetric.decrement(1, [stream, clientIp]);
             });
-            if (clientConnectionMetric) {
-                // Decrement the number of concurrent connections for this client ip
-                intervalCounter.decrement(clientConnectionMetric);
-            }
-        });
+            // Decrement the number of concurrent connections for this client ip
+            // (never going below 0).
+            connectionCountPerIp[clientIp] = Math.max(connectionCountPerIp[clientIp] - 1, 0);
+        }
+        // I'm not sure why, but the 'close' event is fired when the client closes the connection,
+        // and the 'finish' event is fired when KafkaSSE closes the connection (due to an error).
+        // Regsiter them both.
+        res.on('close', decrementConnectionCount);
+        res.on('finish', decrementConnectionCount);
 
         // Start the SSE EventStream connection with topics.
         return kafkaSse(req, res, topics,

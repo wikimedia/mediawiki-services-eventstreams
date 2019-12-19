@@ -1,4 +1,4 @@
-{
+ {
   "name": "eventstreams",
   "version": "0.3.0",
   "description": "Streaming Wikimedia Events via HTTP SSE",

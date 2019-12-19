@@ -17,7 +17,7 @@ variants:
         LINK: g++
   development:
     includes: [build]
-    apt: { packages: [ca-certificates, librdkafka1, librdkafka++1, kafkacat, telnet, iputils-ping, procps, curl, vim] }
+    apt: { packages: [ca-certificates, librdkafka1, librdkafka++1, tcpdump, kafkacat, telnet, iputils-ping, procps, curl, vim] }
     entrypoint: [node, server.js]
   test:
     includes: [build]
