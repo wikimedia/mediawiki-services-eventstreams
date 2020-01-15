@@ -1,4 +1,4 @@
-extends: 
+extends:
   - 'eslint-config-wikimedia/server'
 
 plugins:
@@ -9,7 +9,7 @@ rules:
   camelcase:
     - error
     - properties: never
-  indent: 
+  indent:
     - off
     - 4
   no-unused-vars:
@@ -25,6 +25,6 @@ rules:
   prefer-const:
     - error
   no-underscore-dangle:
-    - off  
+    - off
   array-bracket-spacing:
     - off

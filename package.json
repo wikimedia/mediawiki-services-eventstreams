@@ -41,7 +41,7 @@
     "http-shutdown": "^1.2.1",
     "js-yaml": "^3.13.1",
     "preq": "^0.5.9",
-    "service-runner": "^2.7.3",
+    "service-runner": "https://github.com/wikimedia/service-runner.git#prometheus_metrics",
     "swagger-router": "^0.7.4",
     "swagger-ui-dist": "^3.22.3",
     "uuid": "^3.3.2",

@@ -35,13 +35,16 @@ router.get('/', (req, res, next) => {
     } else if ({}.hasOwnProperty.call(req.query || {}, 'doc')) {
         return swaggerUi.processRequest(app, req, res);
     } else {
+// === EventStreams modification ===
         // Redirect / to documentation page
         res.redirect(303, '/?doc');
+// === End EventStreams modification ===
         next();
     }
 
 });
 
+// === EventStreams modification ===
 /**
  * GET /rc
  * This is the deprecated RCStream service route.  It is no longer used, but
@@ -51,6 +54,7 @@ router.get('/rc', (req, res, next) => {
     // Redirect /rc to documentation page
     res.redirect(301, '/?doc');
 });
+// === End EventStreams modification ===
 
 module.exports = (appObj) => {
 

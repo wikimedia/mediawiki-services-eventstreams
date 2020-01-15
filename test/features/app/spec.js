@@ -1,5 +1,3 @@
-/* global describe, it, before, after */
-
 'use strict';
 
 const parallel = require('mocha.parallel');
@@ -280,7 +278,6 @@ describe('Swagger spec', function () {
                     }
                     testItFunction(testCase.title, function (done) {
 // === End EventStreams modification ===
-
                         return preq(testCase.request)
                         .then((res) => {
                             assert.status(res, testCase.response.status);

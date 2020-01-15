@@ -12,9 +12,8 @@ const yaml = require('js-yaml');
 const addShutdown = require('http-shutdown');
 const path = require('path');
 
-const SwaggerParser = require('swagger-parser');
-
 // === EventStreams modification ===
+const SwaggerParser = require('swagger-parser');
 const _ = require('lodash');
 // === End EventStreams modification ===
 
@@ -77,6 +76,7 @@ function initApp(options) {
     if (app.conf.spec.constructor !== Object) {
         try {
             app.conf.spec = yaml.safeLoad(fs.readFileSync(app.conf.spec));
+
 // === EventStreams modification ===
             // Stream routes are configuered using app conf.
             // Add them to the spec dynamically on startup.
@@ -98,6 +98,7 @@ function initApp(options) {
 
         } catch (e) {
             app.logger.log('warn/spec', `Could not load the spec: ${e}`);
+            app.conf.spec = {};
         }
     }
     if (!app.conf.spec.openapi) {
@@ -141,6 +142,12 @@ function initApp(options) {
     app.set('x-powered-by', false);
     // disable the ETag header - users should provide them!
     app.set('etag', false);
+
+// === EventStreams modification ===
+    // Don't use compression, streams never end.
+    // app.use(compression({ level: app.conf.compression_level }));
+// === End EventStreams modification ===
+
     // use the JSON body parser
     app.use(bodyParser.json({ limit: app.conf.max_body_size || '100kb' }));
     // use the application/x-www-form-urlencoded parser
@@ -203,6 +210,7 @@ function loadRoutes(app, dir) {
 
 }
 
+// === EventStreams modification ===
 /**
  * Uses swagger-parser to dereference any $refs in the swagger spec.
  * app.conf.spec will be modified to included the resolved references.
@@ -223,7 +231,7 @@ function dereferenceSwaggerSpec(app) {
         return app;
     });
 }
-
+// === END EventStreams modification ===
 
 /**
  * Creates and start the service's web server
@@ -271,7 +279,9 @@ module.exports = (options) => {
 
     return initApp(options)
     .then((app) => loadRoutes(app, `${__dirname}/routes`))
+// === EventStreams modification ===
     .then(dereferenceSwaggerSpec)
+// === End EventStreams modification ===
     .then((app) => {
         // serve static files from static/
         app.use('/static', express.static(`${__dirname}/static`));

@@ -77,3 +77,4 @@ services:
       kafka:
         metadata.broker.list: 'localhost:9092'
         statistics.interval.ms: 5000
+
