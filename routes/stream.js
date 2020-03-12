@@ -28,16 +28,39 @@ module.exports = function(appObj) {
     app = appObj;
 
     // Connected clients per stream and client IP service-runner metric.
+    // This is a guage and indicates the current number of connected clients.
     const connectedClientsMetric = app.metrics.makeMetric({
         type: 'Gauge',
         name: `connected-clients`,
         prometheus: {
             name: 'eventstreams_connected_clients',
-            help: 'Connected clients per stream',
+            help: 'Connected clients per stream guage',
             staticLabels: { service: app.metrics.getServiceName() },
         },
         labels: {
             names: ['stream', 'client_ip'],
+            omitLabelNames: true,
+        }
+    });
+
+    // This is a counter of the total number of client connections ever made.
+    // We don't care so much about the totals by client IP here, so it is not a label.
+    // Also, since clients can connect to multiple streams at once, we keep track
+    // of total connections per list of streams, not individual streams.
+    // This helps us keep track of how folks connect and use streams together over time.
+    // The streams label will be a sorted comma separated string list
+    // of streams the client has subscribed to.
+    // https://phabricator.wikimedia.org/T238658#5947574
+    const clientConnectionsTotalMetric = app.metrics.makeMetric({
+        type: 'Counter',
+        name: `client-connections-total`,
+        prometheus: {
+            name: 'eventstreams_client_connections_total',
+            help: 'Client connections total per combination of subscribed streams',
+            staticLabels: { service: app.metrics.getServiceName() },
+        },
+        labels: {
+            names: ['streams'],
             omitLabelNames: true,
         }
     });
@@ -105,11 +128,14 @@ module.exports = function(appObj) {
             });
         }
 
-        // Increment the number of current connections for these streams.
         streams.forEach((stream) => {
             // Increment the number of current connections for this stream using this key.
+            // NOTE: This is a guage so we have to decrement it when the client is disconnected too.
             connectedClientsMetric.increment(1, [stream, clientIp]);
         });
+        // Increment the total counter of clients ever connected to this combination of streams.
+        clientConnectionsTotalMetric.increment(1, [streams.sort().join(',')]);
+
         // Increment the number of connctions for this clientIp
         connectionCountPerIp[clientIp] = (connectionCountPerIp[clientIp] || 0) + 1;
 
