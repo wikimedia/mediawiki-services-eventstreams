@@ -6,7 +6,6 @@ be streamed to clients using [SSE backed by Kafka](https://github.com/wikimedia/
 Here, an 'eventstream' refers to a collection of Kafka topics, each of which are configured
 in the `streams` application config object.
 
-
 ## Routes
 
 ### `GET /v2/stream/{streams}`
