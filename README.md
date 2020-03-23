@@ -32,17 +32,19 @@ e.g. `/v2/stream/edits,single-topic-stream`.  As long as the `Last-Event-ID` hea
 
 Requesting streams will return a never ending SSE stream to the client as SSE events.
 
-When configuring new streams, you should also update spec.yaml to include the new streams.
-The parameter based /v2/stream/{streams} is the real route, but it is convenient to be able
-to read the API docs as if each individual stream was a real explicit route.
-
-All /v2/stream/{streams} routes take a `timestamp` query parameter.  This parameter
+All /v2/stream/{streams} routes take a `since` query parameter.  This parameter
 is expected to either be an integer milliseconds unix epoch timestamp in UTC, or
-a string parseable via `Data.parse()`.  If given, then the requested streams will
+a date-time string parseable via `Date.parse()`.  If given, then the requested streams will
 be attempted to start from offsets that correspond (in Kafka) with the given timestamp.
 If Kafka does not have offsets for the timestamp in its index, then the stream will
 just begin from the end.
 
+## application/json instead of text/event-stream.
+
+By default streams will be returned in SSE text/event-stream format, meant to be consumed by a
+SSE client (AKA EventSource).  If you'd prefer to just consume JSON, you can set the `Accept`
+header to `application/json`.  The stream will then be returned in newline delimited
+JSON event objects.
 
 ## Historical Consumption & Offsets
 If the `Last-Event-ID` request header is set (usually via EventSource), it will be used for

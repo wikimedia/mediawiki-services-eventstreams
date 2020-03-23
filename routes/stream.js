@@ -22,7 +22,6 @@ const router = sUtil.router();
  */
 let app;
 
-
 module.exports = function(appObj) {
 
     app = appObj;
@@ -31,7 +30,7 @@ module.exports = function(appObj) {
     // This is a guage and indicates the current number of connected clients.
     const connectedClientsMetric = app.metrics.makeMetric({
         type: 'Gauge',
-        name: `connected-clients`,
+        name: 'connected-clients',
         prometheus: {
             name: 'eventstreams_connected_clients',
             help: 'Connected clients per stream guage',
