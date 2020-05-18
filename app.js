@@ -78,22 +78,24 @@ function initApp(options) {
             app.conf.spec = yaml.safeLoad(fs.readFileSync(app.conf.spec));
 
 // === EventStreams modification ===
-            // Stream routes are configuered using app conf.
-            // Add them to the spec dynamically on startup.
-            const streamSpec = app.conf.spec.paths['/v2/stream/{streams}'];
-            _.forOwn(app.conf.streams, (streamConfig, streamName) => {
-                const streamPath = `/v2/stream/${streamName}`;
+            if (app.conf.streams) {
+                // Stream routes are configuered using app.conf.streams.
+                // Add them to the spec dynamically on startup.
+                const streamSpec = app.conf.spec.paths['/v2/stream/{streams}'];
+                _.forOwn(app.conf.streams, (streamConfig, streamName) => {
+                    const streamPath = `/v2/stream/${streamName}`;
 
-                app.conf.spec.paths[streamPath] = _.cloneDeep(streamSpec);
+                    app.conf.spec.paths[streamPath] = _.cloneDeep(streamSpec);
 
-                app.conf.spec.paths[streamPath]['get']['description'] =
-                    streamConfig.description ||
-                    `${streamName} stream`;
+                    app.conf.spec.paths[streamPath]['get']['description'] =
+                        streamConfig.description ||
+                        `${streamName} stream`;
 
-                app.conf.spec.paths[streamPath]['get']['summary'] =
-                    streamConfig.summary ||
-                    `${streamName} stream`;
-            })
+                    app.conf.spec.paths[streamPath]['get']['summary'] =
+                        streamConfig.summary ||
+                        `${streamName} stream`;
+                });
+            }
 // === End EventStreams modification ===
 
         } catch (e) {

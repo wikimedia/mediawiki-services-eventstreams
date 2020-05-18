@@ -26,6 +26,15 @@ module.exports = function(appObj) {
 
     app = appObj;
 
+    // If !app.conf.allow_any_stream, make sure that app.conf.streams is provided.
+    // (allow_any_stream should default to false.)
+    if (_.isUndefined(app.conf.allow_any_stream)) {
+        app.conf.allow_any_stream = false;
+    }
+    if (!app.conf.allow_any_stream && !app.conf.streams) {
+        throw new Error('Must provide streams config if allow_any_stream is false');
+    }
+
     // Connected clients per stream and client IP service-runner metric.
     // This is a guage and indicates the current number of connected clients.
     const connectedClientsMetric = app.metrics.makeMetric({
@@ -93,19 +102,22 @@ module.exports = function(appObj) {
         }
 
         const streams = req.params.streams.split(',');
-        // Ensure all requested streams are available.
-        const invalidStreams = streams.filter(stream => !(stream in app.conf.streams));
-        if (invalidStreams.length > 0) {
-            throw new HTTPError({
-                status: 400,
-                type: 'not_found',
-                title: 'Stream Not Found',
-                detail: `Invalid streams: ${invalidStreams.join(',')}`
-            });
+
+
+        if (app.conf.allow_any_stream === false) {
+            // Ensure all requested streams are available.
+            const invalidStreams = streams.filter(stream => !(stream in app.conf.streams));
+            if (invalidStreams.length > 0) {
+                throw new HTTPError({
+                    status: 400,
+                    type: 'not_found',
+                    title: 'Stream Not Found',
+                    detail: `Invalid streams: ${invalidStreams.join(',')}`
+                });
+            }
         }
 
-        // Get the list of topics that make up the requested streams.
-        const topics = _.flatMap(streams, stream => app.conf.streams[stream].topics);
+        const topics = eUtil.getTopicsForStreams(streams, app.conf);
 
         // If since param is provided, it will be used to consume from
         // a point in time in the past, if Last-Event-ID doesn't already

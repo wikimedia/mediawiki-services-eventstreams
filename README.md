@@ -10,7 +10,9 @@ in the `streams` application config object.
 
 ### `GET /v2/stream/{streams}`
 
-Streams are configured in config.yaml.  Each key in the `streams` config object will allowed
+Streams are configured in config.yaml.  If `allow_any_stream` is false (the default)
+then you must configure a list of topics that make up a stream.  This is done by
+providing a streams config object. Each key in the `streams` config object will allowed
 to be provided in the {streams} parameter.  {streams} is a comma separated list of streams names.
 Each of these stream routes will consume from configured topics.  E.g.
 
@@ -28,6 +30,12 @@ Requests to `/v2/stream/edits` will consume from the topics `datacenter1.edit` a
 `topicA`. Multiple streams can be requested, by providing the stream names in a comma separated list,
 e.g. `/v2/stream/edits,single-topic-stream`.  As long as the `Last-Event-ID` header
 (see below) is not set, consumption will start from the latest position in each of these topics.
+
+If a stream is requested that does not have an explicit list of topics declared, then topics will be determinted either by prefixing it with each of the configured `stream_topic_prefixes`, or
+by just using the stream name itself as the topic.
+
+If you want to allow direct consumption of any Kafka topic, you can set `allow_any_stream: true`
+
 
 Requesting streams will return a never ending SSE stream to the client as SSE events.
 

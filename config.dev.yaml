@@ -50,24 +50,31 @@ services:
       # This should match the /v2/stream/ routes configrued in spec.yaml.
       # In production, the stream routes in spec.yaml are dynamically generated
       # from this config object.
-      streams:
-        test:
-          description: "Test event stream. Schema: https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/test/event"
-          topics: [datacenter1.test.event]
-        page-create:
-          topics: [datacenter1.mediawiki.page-create]
-        page-delete:
-          topics: [datacenter1.mediawiki.page-delete]
-        page-move:
-          topics: [datacenter1.mediawiki.page-move]
-        page-undelete:
-          topics: [datacenter1.mediawiki.page-undelete]
-        page-properties-change:
-          topics: [datacenter1.mediawiki.page-properties-change]
-        revision-create:
-          topics: [datacenter1.mediawiki.revision-create]
-        recentchange:
-          topics: [datacenter1.mediawiki.recentchange]
+      # streams:
+      #   test:
+      #     description: "Test event stream. Schema: https://github.com/wikimedia/mediawiki-event-schemas/tree/master/jsonschema/test/event"
+      #     topics: [datacenter1.test.event]
+      #   page-create:
+      #     topics: [datacenter1.mediawiki.page-create]
+      #   page-delete:
+      #     topics: [datacenter1.mediawiki.page-delete]
+      #   page-move:
+      #     topics: [datacenter1.mediawiki.page-move]
+      #   page-undelete:
+      #     topics: [datacenter1.mediawiki.page-undelete]
+      #   page-properties-change:
+      #     topics: [datacenter1.mediawiki.page-properties-change]
+      #   revision-create:
+      #     topics: [datacenter1.mediawiki.revision-create]
+      #   recentchange:
+      #     topics: [datacenter1.mediawiki.recentchange]
+
+
+      # In dev, allow any stream to be requested
+      allow_any_stream: true
+      # Prefix any request stream with this to build the
+      # list Kafka of topics that make up the stream.
+      stream_topic_prefixes: ['datacenter1.']
 
       # kafka configs go here.
       kafka:

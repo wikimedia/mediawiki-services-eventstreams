@@ -67,6 +67,13 @@ services:
         recentchange:
           topics: [eqiad.mediawiki.recentchange, codfw.mediawiki.recentchange]
 
+      # In prod, only explicitly configured streams are allowed. (this is the default)
+      allow_any_streams: false
+      # Prefix any request stream with this to build the
+      # list Kafka of topics that make up the stream.
+      # Only set this if you don't explicitly list your topics aboce.
+      #stream_topic_prefixes: ['eqiad.', 'codfw.']
+
       # kafka configs go here.
       kafka:
         metadata.broker.list: 'localhost:9092'
