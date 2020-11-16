@@ -3,7 +3,9 @@
 const http = require('http');
 const BBPromise = require('bluebird');
 const express = require('express');
-const compression = require('compression');
+// === EventStreams modification ===
+// const compression = require('compression');
+// === End EventStreams modification ===
 const bodyParser = require('body-parser');
 const fs = BBPromise.promisifyAll(require('fs'));
 const sUtil = require('./lib/util');
@@ -12,10 +14,6 @@ const yaml = require('js-yaml');
 const addShutdown = require('http-shutdown');
 const path = require('path');
 
-// === EventStreams modification ===
-const SwaggerParser = require('swagger-parser');
-const _ = require('lodash');
-// === End EventStreams modification ===
 
 /**
  * Creates an express app and initialises it
@@ -76,28 +74,6 @@ function initApp(options) {
     if (app.conf.spec.constructor !== Object) {
         try {
             app.conf.spec = yaml.safeLoad(fs.readFileSync(app.conf.spec));
-
-// === EventStreams modification ===
-            if (app.conf.streams) {
-                // Stream routes are configuered using app.conf.streams.
-                // Add them to the spec dynamically on startup.
-                const streamSpec = app.conf.spec.paths['/v2/stream/{streams}'];
-                _.forOwn(app.conf.streams, (streamConfig, streamName) => {
-                    const streamPath = `/v2/stream/${streamName}`;
-
-                    app.conf.spec.paths[streamPath] = _.cloneDeep(streamSpec);
-
-                    app.conf.spec.paths[streamPath]['get']['description'] =
-                        streamConfig.description ||
-                        `${streamName} stream`;
-
-                    app.conf.spec.paths[streamPath]['get']['summary'] =
-                        streamConfig.summary ||
-                        `${streamName} stream`;
-                });
-            }
-// === End EventStreams modification ===
-
         } catch (e) {
             app.logger.log('warn/spec', `Could not load the spec: ${e}`);
             app.conf.spec = {};
@@ -145,10 +121,10 @@ function initApp(options) {
     // disable the ETag header - users should provide them!
     app.set('etag', false);
 
-// === EventStreams modification ===
+    // === EventStreams modification ===
     // Don't use compression, streams never end.
     // app.use(compression({ level: app.conf.compression_level }));
-// === End EventStreams modification ===
+    // === End EventStreams modification ===
 
     // use the JSON body parser
     app.use(bodyParser.json({ limit: app.conf.max_body_size || '100kb' }));
@@ -212,29 +188,6 @@ function loadRoutes(app, dir) {
 
 }
 
-// === EventStreams modification ===
-/**
- * Uses swagger-parser to dereference any $refs in the swagger spec.
- * app.conf.spec will be modified to included the resolved references.
- * @param {Application} app the application object to load routes into
- * @return {Promise} a promise resolving to the app object
- */
-function dereferenceSwaggerSpec(app) {
-    // resolve any remote references in the spec using SwaggerParser
-    return SwaggerParser.dereference(app.conf.spec)
-    .then((specDereferenced) => {
-        app.conf.spec = specDereferenced;
-        return app;
-    })
-    // We don't want to die because of a swagger spec resolve problem,
-    // so just return app to continue on error.  (SwaggerParser.dereference
-    // will log the error.)
-    .catch((e) => {
-        return app;
-    });
-}
-// === END EventStreams modification ===
-
 /**
  * Creates and start the service's web server
  * @param {Application} app the app object to use in the service
@@ -281,9 +234,6 @@ module.exports = (options) => {
 
     return initApp(options)
     .then((app) => loadRoutes(app, `${__dirname}/routes`))
-// === EventStreams modification ===
-    .then(dereferenceSwaggerSpec)
-// === End EventStreams modification ===
     .then((app) => {
         // serve static files from static/
         app.use('/static', express.static(`${__dirname}/static`));

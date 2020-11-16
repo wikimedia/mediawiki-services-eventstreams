@@ -209,7 +209,7 @@ function validateBody(resBody, expBody) {
     if (expBody.constructor === Object) {
         Object.keys(expBody).forEach((key) => {
             const val = expBody[key];
-             // eslint-disable-next-line
+            // eslint-disable-next-line
             assert.deepEqual(resBody.hasOwnProperty(key), true, `Body field ${key} not found in response!`);
             if (val.constructor === Object) {
                 validateBody(resBody[key], val);

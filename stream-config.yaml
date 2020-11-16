@@ -1,0 +1,13 @@
+mediawiki.page-create:
+  topics: [eqiad.mediawiki.page-create, codfw.mediawiki.page-delete]
+  stream_aliases: [page-create]
+  description: |-
+    mediawiki.page-create events. This page create stream is just the first revision create event for each page. As such, it reuses the mediawiki/revision/create schema.
+  # $schema: https://schema.wikimedia.org/repositories/primary/jsonschema/mediawiki/revision/create/latest
+
+mediawiki.revision-create:
+  topics: [eqiad.mediawiki.revision-create, codfw.mediawiki.revision-create]
+  stream_aliases: [revision-create]
+  description: |-
+    mediawiki.revision-create events.
+  # $schema: https://schema.wikimedia.org/repositories/primary/jsonschema/mediawiki/revision/create/latest

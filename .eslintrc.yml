@@ -1,30 +1,26 @@
-extends:
-  - 'eslint-config-wikimedia/server'
+extends: 'eslint-config-wikimedia'
 
-plugins:
-  - json
-  - jsdoc
+parserOptions:
+  ecmaVersion: 10
+
+env:
+  node: true
+  es6: true
+
 
 rules:
-  camelcase:
-    - error
-    - properties: never
   indent:
-    - off
+    - error
     - 4
-  no-unused-vars:
-    - error
-    - args: none
-  space-in-parens:
-    - error
-    - never
-  computed-property-spacing:
-    - off
-  no-multi-spaces:
-    - off
-  prefer-const:
-    - error
-  no-underscore-dangle:
-    - off
-  array-bracket-spacing:
-    - off
+    - SwitchCase: 1
+      MemberExpression: off
+  space-in-parens: [error, never]
+  no-multi-spaces: off
+  no-multiple-empty-lines: off
+  one-var: off
+  computed-property-spacing: off
+  no-unused-vars: [error, {args: none}]
+  comma-dangle: off
+  camelcase: off
+  key-spacing: off
+  array-bracket-spacing: off

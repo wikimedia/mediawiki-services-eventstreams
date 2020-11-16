@@ -10,18 +10,17 @@ in the `streams` application config object.
 
 ### `GET /v2/stream/{streams}`
 
-Streams are configured in config.yaml.  If `allow_any_stream` is false (the default)
-then you must configure a list of topics that make up a stream.  This is done by
-providing a streams config object. Each key in the `streams` config object will allowed
-to be provided in the {streams} parameter.  {streams} is a comma separated list of streams names.
-Each of these stream routes will consume from configured topics.  E.g.
+Streams can be configured at `stream_config_uri`.  The content at this URI is expected to be
+configuration for all streams that could be exposed.  You can limit the streams exposed from this
+configuration object by setting a list of names in the `allowed_streams` config.
+
+At minimum, stream configuration must map stream name to a list of Kafka topics, e.g.
 
 ```yaml
-streams:
-  edits:
-    topics: [datacenter1.edit, datacenter2.edit]
-  single-topic-stream:
-    topics: [topicA]
+edits:
+  topics: [datacenter1.edit, datacenter2.edit]
+single-topic-stream:
+  topics: [topicA]
 ```
 
 In this example, `/v2/stream/edits` and `/v2/stream/single-topic-stream` would be valid requests.
@@ -30,12 +29,6 @@ Requests to `/v2/stream/edits` will consume from the topics `datacenter1.edit` a
 `topicA`. Multiple streams can be requested, by providing the stream names in a comma separated list,
 e.g. `/v2/stream/edits,single-topic-stream`.  As long as the `Last-Event-ID` header
 (see below) is not set, consumption will start from the latest position in each of these topics.
-
-If a stream is requested that does not have an explicit list of topics declared, then topics will be determinted either by prefixing it with each of the configured `stream_topic_prefixes`, or
-by just using the stream name itself as the topic.
-
-If you want to allow direct consumption of any Kafka topic, you can set `allow_any_stream: true`
-
 
 Requesting streams will return a never ending SSE stream to the client as SSE events.
 
@@ -70,3 +63,9 @@ multi datacenter Kafka clusters for better high availability of the EventStreams
 
 See the [KafkaSSE README](https://github.com/wikimedia/kafkasse#kafkasse) for more information on
 how `Last-Event-ID` works.
+
+## Dynamic OpenAPI spec
+Stream configuration found at `stream_config_uri` can be used to build a dynamic OpenAPI spec.
+EventStreams app config is combined with stream config settings to augment the spec
+with request description, response schema and response examples.
+config.yaml documentents how stream config settings are used to do this.

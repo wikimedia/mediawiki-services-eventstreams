@@ -1,7 +1,7 @@
 # Number of worker processes to spawn.
 # Set to 0 to run everything in a single process without clustering.
 # Use 'ncpu' to run as many workers as there are CPU units
-num_workers: ncpu
+num_workers: 0
 
 # Log error messages and gracefully restart a worker if v8 reports that it
 # uses more heap (note: not RSS) than this many mb.
@@ -9,12 +9,14 @@ worker_heap_limit_mb: 500
 
 # Logger info
 logging:
-  level: warn
+  level: info
   streams:
-  # Use gelf-stream -> logstash
-  - type: gelf
-    host: logstash1003.eqiad.wmnet
-    port: 12201
+    - type: debug
+  # streams:
+  # # Use gelf-stream -> logstash
+  # - type: gelf
+  #   host: logstash1003.eqiad.wmnet
+  #   port: 12201
 
 # Statsd metrics reporter
 metrics:
@@ -43,36 +45,89 @@ services:
       # we limit the number of connections per X-Client-IP.
       client_ip_connection_limit: 2
 
-      # Stream routes configuration.  Each key in this object will be a route path at
-      # /v2/stream/{stream_name}, and each stream config object should configure a list of
-      # topics to be included in that stream.
-      # This should match the /v2/stream/ routes configrued in spec.yaml.
-      # In production, the stream routes in spec.yaml are dynamically generated
-      # from this config object.
-      streams:
-        test:
-          topics: [eqiad.test.event, codfw.test.event]
-        page-create:
-          topics: [eqiad.mediawiki.page-create, codfw.mediawiki.page-create]
-        page-delete:
-          topics: [eqiad.mediawiki.page-delete, codfw.mediawiki.page-delete]
-        page-move:
-          topics: [eqiad.mediawiki.page-move, codfw.mediawiki.page-move]
-        page-undelete:
-          topics: [eqiad.mediawiki.page-undelete, codfw.mediawiki.page-undelete]
-        page-properties-change:
-          topics: [eqiad.mediawiki.page-properties-change, codfw.mediawiki.page-properties-change]
-        revision-create:
-          topics: [eqiad.mediawiki.revision-create, codfw.mediawiki.revision-create]
-        recentchange:
-          topics: [eqiad.mediawiki.recentchange, codfw.mediawiki.recentchange]
+      # A URI from which 'stream configuration' will be fetched.
+      #
+      # The object returned by this URI should map a stream name to its config settings,
+      # which must include topics.  If schema_title is set, it will be mentioned
+      # in the generated OpenAPI spec.
+      #
+      #stream_config_uri: ./stream-config.yaml
+      # OR:
+      stream_config_uri: https://meta.wikimedia.org/w/api.php?action=streamconfigs&all_settings=1
 
-      # In prod, only explicitly configured streams are allowed. (this is the default)
-      allow_any_streams: false
-      # Prefix any request stream with this to build the
-      # list Kafka of topics that make up the stream.
-      # Only set this if you don't explicitly list your topics aboce.
-      #stream_topic_prefixes: ['eqiad.', 'codfw.']
+      # If provided, these options will be passed when opening stream_config_uri
+      # for reading.  If this is a local file path, fs.readFile options should be
+      # given.  If this is a remote http URI, preq.get options should be used.
+      #stream_config_uri_options: {'headers': {'Host': 'streamconfig.service.org'}}
+
+      # If set, the stream configs are expected to live in a subobject
+      # of the result object returned from stream_config_uri. The stream
+      # configs object will be extracted at this path.
+      # This should be a path string that Lodash#get understands.
+      stream_config_object_path: 'streams'
+
+      # How long in seconds stream configs live in cache before being recached.
+      # 0 or unset means no expiration.
+      stream_config_ttl: 300
+
+      # Default stream config settings to apply to the configs fetched from stream_config_uri.
+      # EventStreams uses some extra settings:
+      # - stream_aliases
+      #     An array of stream route aliases from which to allow subscription to the stream.
+      #     You might use this if you want to expose a stream at an additional name
+      #     than its canonical stream name.
+      # - description
+      #     Will be added to the OpenAPI spec's description of the stream route.
+      # - $schema
+      #     If set, will be used to augmment the OpenAPI spec's response schema and examples.
+      stream_config_defaults:
+        mediawiki.page-create:
+          stream_aliases: [page-create]
+          description: |-
+            mediawiki.page-create events. This page create stream is just the first revision create event for each page. As such, it reuses the mediawiki/revision/create schema.
+        mediawiki.page-delete:
+          stream_aliases: [page-delete]
+        mediawiki.page-move:
+          stream_aliases: [page-move]
+        mediawiki.page-undelete:
+          stream_aliases: [page-undelete]
+        mediawiki.page-properties-change:
+          stream_aliases: [page-properties-change]
+        mediawiki.revision-create:
+          stream_aliases: [revision-create]
+        mediawiki.recentchange:
+          stream_aliases: [recentchange-delete]
+
+      # If set, these URIs will be prepended to any relative schema URI
+      # extracted from the $schema stream config setting, or the URI constructed
+      # using the schema_title stream config setting.. The resulting URLs will
+      # be searched until a schema is found.  Change this
+      # to match paths to your schema repositories.
+      schema_base_uris: [
+          https://schema.wikimedia.org/repositories/primary/jsonschema,
+          https://schema.wikimedia.org/repositories/secondary/jsonschema
+      ]
+      # If provided, these options will be passed when opening schema URIs.
+      # for reading.  If a schema URI is a local file path, fs.readFile options should be
+      # given.  If a schema URI is a remote http URI, preq.get options should be used.
+      #schema_uri_options: {'headers': {'Host': 'schema.service.org'}}
+
+      # If given, and no $schema is found in a stream config, a schema URI will
+      # attempt to be constructed a /${schema_title}/${schema_latest_version}.
+      # If this is not set, no schema URI will be inferred using schema_title.
+      schema_latest_version: 'latest'
+
+      # Explicit list of allowed streams.  If this is not set, all streams fetched from
+      # the stream_config_uri will be exposed.  Otherwise, only streams in this list
+      # will be exposed.
+      allowed_streams:
+        - mediawiki.page-create
+        - mediawiki.page-delete
+        - mediawiki.page-move
+        - mediawiki.page-undelete
+        - mediawiki.page-properties-change
+        - mediawiki.revision-create
+        - mediawiki.recentchange
 
       # kafka configs go here.
       kafka:
