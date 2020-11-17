@@ -170,7 +170,13 @@ async function loadStreamConfigs(app) {
         }
     }));
 
-    return streamConfigs;
+    // 'sort' streamConfigs by stream name and then return it.
+    // streamConfigs are used to generated the dynamic OpenAPI spec,
+    // and it is nice to see the routes in order in /?doc.
+    return Object.keys(streamConfigs).sort().reduce((r, k) => {
+        r[k] = streamConfigs[k];
+        return r;
+    }, {});
 }
 
 /**
@@ -198,6 +204,7 @@ function updateSpec(app, streamConfigs) {
         // The stream specific routes do not take a {streams} parameter.  It is the first
         // listed, so shift the parameters array to remove it.
         streamRouteSpec.get.parameters.shift();
+        streamRouteSpec.get.summary = `${streamName} events`;
 
         if (streamConfig.description) {
             // Use the streamConfig description in the route description.
