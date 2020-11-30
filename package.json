@@ -48,7 +48,7 @@
     "uuid": "^3.3.2",
     "kafka-sse": "https://github.com/wikimedia/KafkaSSE.git#e4194f2",
     "lodash": "^4.15.0",
-    "node-rdkafka": "2.3.4",
+    "node-rdkafka": "~2.4.2",
     "node-rdkafka-statsd": "^0.1.0",
     "@wikimedia/url-get": "^1.0.0"
   },

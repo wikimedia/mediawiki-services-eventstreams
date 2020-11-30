@@ -2,6 +2,7 @@
 
 const _ = require('lodash');
 const kafkaSse = require('kafka-sse');
+const express = require('express');
 
 const {
     urlGetObject,
@@ -432,6 +433,13 @@ module.exports = async (app) => {
             atTimestamp
         );
     });
+
+    const uiEnabled = app.conf.stream_ui_enabled || true;
+    if (uiEnabled) {
+        app.logger.log('debug', 'Enabling HTML stream GUI at /v2/ui');
+        app.use('/v2/ui', express.static(`${__dirname}/../ui/dist`));
+        app.use(express.static(`${__dirname}/../ui/dist`));
+    }
 
     return {
         path: '/v2',

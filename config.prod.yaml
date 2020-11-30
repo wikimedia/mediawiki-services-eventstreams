@@ -39,6 +39,10 @@ services:
       # allow cross-domain requests to the API (default '*')
       cors: '*'
 
+      # If enabled, a HTML based stream GUI will be made available at /v2/ui.
+      # Defaults to true if undefined.
+      #stream_ui_enabled: true
+
       # Connection limiting.  EventStreams connections are
       # expected to be long lived, so we can't use typical
       # connections per second type ratelimiting.  Instead,
