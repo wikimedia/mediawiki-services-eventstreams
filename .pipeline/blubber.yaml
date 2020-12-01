@@ -10,19 +10,19 @@ variants:
     base: docker-registry.wikimedia.org/nodejs10-devel
     copies: [local]
     apt: { packages: [git, build-essential, python-pkgconfig, librdkafka-dev] }
-    node: { requirements: [package.json] }
+    node: { requirements: [package.json, ./ui/] }
     runs:
       environment:
         BUILD_LIBRDKAFKA: "0"
         LINK: g++
-  development:
-    includes: [build]
-    apt: { packages: [ca-certificates, librdkafka1, librdkafka++1, tcpdump, kafkacat, telnet, iputils-ping, procps, curl, vim] }
-    entrypoint: [node, server.js]
   test:
     includes: [build]
     apt: { packages: [ca-certificates] }
     entrypoint: [npm, test]
+  development:
+    includes: [build]
+    apt: { packages: [ca-certificates, librdkafka1, librdkafka++1, tcpdump, kafkacat, telnet, iputils-ping, procps, curl, vim] }
+    entrypoint: [node, server.js]
   prep:
     includes: [build]
     node: { env: production }

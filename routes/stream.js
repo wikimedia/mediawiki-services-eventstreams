@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('fs');
 const _ = require('lodash');
 const kafkaSse = require('kafka-sse');
 const express = require('express');
@@ -436,6 +437,13 @@ module.exports = async (app) => {
 
     const uiEnabled = app.conf.stream_ui_enabled || true;
     if (uiEnabled) {
+        if (!fs.existsSync(`${__dirname}/../ui/dist`)) {
+            throw new Error(
+                'Cannot enable HTML stream GUI at /v2/ui: The ui/dist directory does not exist.' +
+                ' Run `npm run build-ui`.'
+            );
+        }
+
         app.logger.log('debug', 'Enabling HTML stream GUI at /v2/ui');
         app.use('/v2/ui', express.static(`${__dirname}/../ui/dist`));
         app.use(express.static(`${__dirname}/../ui/dist`));

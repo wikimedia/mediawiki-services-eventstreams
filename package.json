@@ -1,16 +1,19 @@
 {
   "name": "eventstreams",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Streaming Wikimedia Events via HTTP SSE",
   "main": "./app.js",
   "scripts": {
     "start": "service-runner",
-    "test": "PREQ_CONNECT_TIMEOUT=15 mocha && npm run lint",
+    "test": "npm run unit-test && npm run lint",
+    "unit-test": "PREQ_CONNECT_TIMEOUT=15 mocha",
     "lint": "eslint --cache --cache-location=${TMPDIR:-/tmp}/eventstreams.eslintcache --max-warnings 0 --ext .js --ext .json routes lib app.js",
     "docker-start": "service-runner docker-start",
     "docker-test": "service-runner docker-test",
     "test-build": "service-runner docker-test && service-runner build --deploy-repo --force",
-    "coverage": "nyc --reporter=lcov _mocha"
+    "coverage": "nyc --reporter=lcov _mocha",
+    "build-ui": "npm --prefix ./ui install && npm --prefix ./ui run build",
+    "postinstall": "npm run build-ui"
   },
   "repository": {
     "type": "git",
