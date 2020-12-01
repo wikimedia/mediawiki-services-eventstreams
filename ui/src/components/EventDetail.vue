@@ -117,10 +117,10 @@ It allows to copy the text to the clipboard by clicking a button.
   .event-detail .el-tab-pane {
     padding: 16px;
     color: #303133;
+    line-height: 20px;
   }
-  .event-detail .vjs-tree__brackets:hover {
-    color: #606266;
-    cursor: text;
+  .event-detail .el-tabs__item {
+    font-family: arial;
   }
 
   /* Overriding vue-json-pretty highlight style */
@@ -129,6 +129,10 @@ It allows to copy the text to the clipboard by clicking a button.
   .event-detail .vjs-value__boolean { color: blue; }
 
   /* Adjusting element-ui style */
+  .event-detail .vjs-tree__brackets:hover {
+    color: #606266;
+    cursor: text;
+  }
   .event-detail .el-tabs__item {
     color: #606266;
   }
@@ -137,5 +141,9 @@ It allows to copy the text to the clipboard by clicking a button.
   }
   .event-detail .el-dialog__header, .event-detail .el-dialog__body {
     padding-top: 16px;
+  }
+  /* Not prefixed on purpose */
+  .el-notification {
+    font-family: arial;
   }
 </style>

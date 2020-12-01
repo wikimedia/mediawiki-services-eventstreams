@@ -14,6 +14,7 @@
   #eventstreams-ui-app {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-family: arial;
   }
   body {
     margin: 0;

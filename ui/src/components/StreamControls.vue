@@ -107,4 +107,8 @@ and start/stop consumption of those.
   .stream-controls span.el-select__tags-text {
     font-size: 12px;
   }
+  /* Not prefixed on purpose */
+  .el-select-dropdown__item {
+    font-family: arial;
+  }
 </style>

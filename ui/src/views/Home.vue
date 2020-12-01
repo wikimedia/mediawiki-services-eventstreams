@@ -71,6 +71,7 @@ emitted events for all sub-components.
         isStreaming: false,
         eventSource: null,
         consumedEvents: [],
+        maxConsumedEvents: 100,
         eventDetailData: null,
         eventDetailIsVisible: false
       };
@@ -129,19 +130,56 @@ emitted events for all sub-components.
         }
       },
       updateIsStreaming: function (newValue) {
+        if (this.isStreaming === newValue) { return; }
         this.isStreaming = newValue;
         // Update the SSE EventSource.
         if (newValue) {
-          this.eventSource = EventStreamsApi.consumeStreams(
-            this.selectedStreams,
-            this.consumeEvent
-          );
+          if (this.consumedEvents.length >= this.maxConsumedEvents) {
+            // If maxConsumedEvents events have been consumed,
+            // do not start streaming and warn the user instead.
+            this.openLimitWarning();
+            // This needs to be within a $nextTick to affect the sub-component.
+            this.$nextTick(() => { this.isStreaming = false; });
+          } else {
+            this.eventSource = EventStreamsApi.consumeStreams(
+              this.selectedStreams,
+              this.consumeEvent
+            );
+          }
         } else {
           this.closeEventSource();
         }
       },
       consumeEvent: function (event) {
         this.consumedEvents.push(event.data);
+        if (this.consumedEvents.length >= this.maxConsumedEvents) {
+          // If maxConsumedEvents events have been consumed, stop streaming.
+          // This is meant to avoid that users forget their browser tabs open
+          // consuming events indefinitely.
+          this.updateIsStreaming(false);
+          this.openLimitWarning();
+        }
+      },
+      openLimitWarning: function () {
+        this.$alert(
+          'You\'ve reached the limit of events displayed, streaming stopped.',
+          'Warning',
+          {
+            type: 'warning',
+            confirmButtonText: 'Got it',
+            showCancelButton: true,
+            cancelButtonText: 'Clear events and continue streaming',
+            cancelButtonClass: 'el-button--default is-plain',
+            showClose: false,
+            closeOnClickModal: false,
+            center: true
+          }
+        ).catch(() => {
+          // Clear events and continue streaming.
+          this.closeEventDetail();
+          this.clearConsumedEvents();
+          this.updateIsStreaming(true);
+        });
       },
       closeEventSource: function () {
         if (this.eventSource !== null) {
@@ -169,49 +207,53 @@ emitted events for all sub-components.
 </script>
 
 <style>
-  .links {
+  .home .links {
     margin-right: 16px;
     text-align: right;
   }
-  .centered {
+  .home .centered {
     width: 900px;
     margin: 0 auto;
   }
-  .logo-text {
+  .home .logo-text {
     font-size: 32px;
-    font-family: sans-serif;
     color: #fff;
     margin-right: 8px;
     vertical-align: middle;
   }
-  .stream-controls {
+  .home .stream-controls {
     display: inline;
   }
-  .nav-bar {
+  .home .nav-bar {
     background-color: #606266;
     padding: 8px 0 14px 0;
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
   }
-  .opaque {
+  .home .opaque {
     width: 360px;
     margin: 8px auto 0 auto;
     background-color: white;
     padding: 11px 0;
     border-radius: 24px;
   }
-  .stream-stats {
+  .home .stream-stats {
     width: 335px;
     margin: 0 auto;
   }
-  .el-header {
+  .home .el-header {
     padding: 0 !important;
     position: fixed;
     height: 102px !important;
     width: 100%;
     z-index: 2;
   }
-  .el-main {
+  .home .el-main {
     padding-top: 145px !important;
     z-index: 1;
+  }
+  /* Not prefixed on purpose */
+  .el-message-box {
+    font-family: arial;
+    width: 500px !important;
   }
 </style>
