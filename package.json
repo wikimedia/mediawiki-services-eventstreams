@@ -12,8 +12,7 @@
     "docker-test": "service-runner docker-test",
     "test-build": "service-runner docker-test && service-runner build --deploy-repo --force",
     "coverage": "nyc --reporter=lcov _mocha",
-    "build-ui": "npm --prefix ./ui install && npm --prefix ./ui run build",
-    "postinstall": "npm run build-ui"
+    "build-ui": "npm --prefix ./ui install && npm --prefix ./ui run build"
   },
   "repository": {
     "type": "git",

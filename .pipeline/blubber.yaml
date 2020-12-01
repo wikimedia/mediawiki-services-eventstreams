@@ -10,7 +10,11 @@ variants:
     base: docker-registry.wikimedia.org/nodejs10-devel
     copies: [local]
     apt: { packages: [git, build-essential, python-pkgconfig, librdkafka-dev] }
-    node: { requirements: [package.json, ./ui/] }
+    node:
+      requirements: [package.json]
+    builder:
+      requirements: [ui/]
+      command: [npm, run, build-ui]
     runs:
       environment:
         BUILD_LIBRDKAFKA: "0"
