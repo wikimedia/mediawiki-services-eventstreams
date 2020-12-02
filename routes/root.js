@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('fs');
 const sUtil = require('../lib/util');
 const swaggerUi = require('../lib/swagger-ui');
 
@@ -36,8 +37,14 @@ router.get('/', (req, res, next) => {
         return swaggerUi.processRequest(app, req, res);
     } else {
         // === EventStreams modification ===
-        // Redirect / to documentation page
-        res.redirect(303, '/?doc');
+        // Redirect / to /v2/ui or to /?doc
+        const uiEnabled = (app.conf.stream_ui_enabled || true) &&
+            fs.existsSync(`${__dirname}/../ui/dist`);
+        if (uiEnabled) {
+            res.redirect(303, '/v2/ui');
+        } else {
+            res.redirect(303, '/?doc');
+        }
         // === End EventStreams modification ===
         next();
     }
