@@ -1,0 +1,38 @@
+{
+	"extends": "eslint-config-wikimedia",
+	"parserOptions": {
+		"ecmaVersion": 10
+	},
+	"env": {
+		"node": true,
+		"es6": true
+	},
+	"rules": {
+		"indent": [
+			"error",
+			4,
+			{
+				"SwitchCase": 1,
+				"MemberExpression": "off"
+			}
+		],
+		"space-in-parens": [
+			"error",
+			"never"
+		],
+		"no-multi-spaces": "off",
+		"no-multiple-empty-lines": "off",
+		"one-var": "off",
+		"computed-property-spacing": "off",
+		"no-unused-vars": [
+			"error",
+			{
+				"args": "none"
+			}
+		],
+		"comma-dangle": "off",
+		"camelcase": "off",
+		"key-spacing": "off",
+		"array-bracket-spacing": "off"
+	}
+}
