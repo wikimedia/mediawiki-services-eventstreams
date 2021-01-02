@@ -7,7 +7,7 @@
     "start": "service-runner",
     "test": "npm run unit-test && npm run lint",
     "unit-test": "PREQ_CONNECT_TIMEOUT=15 mocha",
-    "lint": "eslint --cache --cache-location=${TMPDIR:-/tmp}/eventstreams.eslintcache --max-warnings 0 --ext .js --ext .json routes lib app.js",
+    "lint": "eslint --cache --cache-location=${TMPDIR:-/tmp}/eventstreams.eslintcache --ext .js --ext .json routes lib app.js",
     "docker-start": "service-runner docker-start",
     "docker-test": "service-runner docker-test",
     "test-build": "service-runner docker-test && service-runner build --deploy-repo --force",
