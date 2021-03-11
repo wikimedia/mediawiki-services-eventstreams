@@ -268,16 +268,7 @@ describe('Swagger spec', function () {
                 after(() => server.stop());
 
                 constructTests(spec).forEach((testCase) => {
-
-// === EventStreams modification ===
-                    // skip all /v2/stream/* tests, as stream requests don't
-                    // work with preq.  See: https://phabricator.wikimedia.org/T150439
-                    let testItFunction = it;
-                    if (testCase.title.startsWith('/v2/stream')) {
-                        testItFunction = it.skip;
-                    }
-                    testItFunction(testCase.title, function (done) {
-// === End EventStreams modification ===
+                    it(testCase.title, function (done) {
                         return preq(testCase.request)
                         .then((res) => {
                             assert.status(res, testCase.response.status);
