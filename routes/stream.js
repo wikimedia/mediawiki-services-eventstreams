@@ -161,7 +161,7 @@ async function loadStreamConfigs(app) {
         // as a shortcut route for a stream name, but the original stream name is
         // still exposed as a route too.
         if (streamConfig.stream_aliases) {
-            streamConfig.stream_aliases.forEach(stream_alias => {
+            streamConfig.stream_aliases.forEach((stream_alias) => {
                 streamConfigs[stream_alias] = _.cloneDeep(streamConfig);
                 streamConfigs[stream_alias].description +=
                     `\n\n(NOTE: This stream is an alias of ${streamName})`;
@@ -246,6 +246,7 @@ function updateSpec(app, streamConfigs) {
 
 /**
  * Set up the /v2/stream/{stream} route using stream config.
+ *
  * @param {Object} app
  */
 module.exports = async (app) => {
@@ -347,7 +348,7 @@ module.exports = async (app) => {
 
         const requestedStreams = req.params.streams.split(',');
         // Ensure all requested streams are available.
-        const invalidStreams = requestedStreams.filter(s => !_.includes(_.keys(streamConfigs), s));
+        const invalidStreams = requestedStreams.filter((s) => !_.includes(_.keys(streamConfigs), s));
         if (invalidStreams.length > 0) {
             throw new HTTPError({
                 status: 400,
@@ -357,9 +358,11 @@ module.exports = async (app) => {
             });
         }
 
+        // TODO: flatMap() is ES2019, but we're meant to run this code on Node 10 which is ES2018?
+        // eslint-disable-next-line no-restricted-properties
         const topics = _.uniq(_.flatMap(
             _.pick(streamConfigs, requestedStreams),
-            streamConfig => streamConfig.topics
+            (streamConfig) => streamConfig.topics
         ));
 
         // If since param is provided, it will be used to consume from
@@ -377,7 +380,6 @@ module.exports = async (app) => {
                 status: 400,
                 type: 'invalid_timestamp',
                 title: 'Invalid timestamp',
-                // eslint-disable-next-line max-len
                 detail: `since timestamp is not a UTC milliseconds unix epoch and was not parseable: '${req.query.since}'`
             });
         }

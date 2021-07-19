@@ -1,11 +1,10 @@
 {
-	"extends": "eslint-config-wikimedia",
-	"parserOptions": {
-		"ecmaVersion": 10
-	},
-	"env": {
-		"node": true,
-		"es6": true
+	"root": true,
+	"extends": [
+		"wikimedia/server"
+	],
+	"globals": {
+		"bluebird": "readonly"
 	},
 	"rules": {
 		"indent": [
@@ -22,7 +21,6 @@
 		],
 		"no-multi-spaces": "off",
 		"no-multiple-empty-lines": "off",
-		"one-var": "off",
 		"computed-property-spacing": "off",
 		"no-unused-vars": [
 			"error",
@@ -34,5 +32,11 @@
 		"camelcase": "off",
 		"key-spacing": "off",
 		"array-bracket-spacing": "off"
-	}
+	},
+	"overrides": [
+		{
+			"files": "**/*.json",
+			"extends": "wikimedia/json"
+		}
+	]
 }
