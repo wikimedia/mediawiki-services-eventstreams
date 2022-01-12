@@ -32,7 +32,7 @@ variants:
     node: { env: production }
   production:
     copies: [prep]
-    apt: { packages: [ca-certificates, librdkafka1, librdkafka++1] }
+    apt: { packages: [ca-certificates, wmf-certificates, librdkafka1, librdkafka++1] }
     node: { env: production }
     runs: { environment: { UV_THREADPOOL_SIZE: "128" } }
     entrypoint: [node, server.js]
