@@ -56,7 +56,7 @@ services:
       #
       stream_config_uri: ./stream-config.yaml
       # OR:
-      #stream_config_uri: https://meta.wikimedia.org/w/api.php?action=streamconfigs&all_settings=1
+      #stream_config_uri: https://meta.wikimedia.org/w/api.php?action=streamconfigs
 
       # If provided, these options will be passed when opening stream_config_uri
       # for reading.  If stream_config_uri is a local file path, fs.readFile options should be
