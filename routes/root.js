@@ -38,7 +38,7 @@ router.get('/', (req, res, next) => {
     } else {
         // === EventStreams modification ===
         // Redirect / to /v2/ui or to /?doc
-        const uiEnabled = (app.conf.stream_ui_enabled || true) &&
+        const uiEnabled = app.conf.stream_ui_enabled &&
             fs.existsSync(`${__dirname}/../ui/dist`);
         if (uiEnabled) {
             res.redirect(303, '/v2/ui');

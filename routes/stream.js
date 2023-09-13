@@ -348,7 +348,8 @@ module.exports = async (app) => {
 
         const requestedStreams = req.params.streams.split(',');
         // Ensure all requested streams are available.
-        const invalidStreams = requestedStreams.filter((s) => !_.includes(_.keys(streamConfigs), s));
+        const invalidStreams =
+          requestedStreams.filter((s) => !_.includes(_.keys(streamConfigs), s));
         if (invalidStreams.length > 0) {
             throw new HTTPError({
                 status: 400,
@@ -358,11 +359,9 @@ module.exports = async (app) => {
             });
         }
 
-        // TODO: flatMap() is ES2019, but we're meant to run this code on Node 10 which is ES2018?
-        // eslint-disable-next-line no-restricted-properties
-        const topics = _.uniq(_.flatMap(
+        const topics = _.uniq([].concat(_.map(
             _.pick(streamConfigs, requestedStreams),
-            (streamConfig) => streamConfig.topics
+            (streamConfig) => streamConfig.topics)
         ));
 
         // If since param is provided, it will be used to consume from
@@ -408,7 +407,7 @@ module.exports = async (app) => {
         }
         // I'm not sure why, but the 'close' event is fired when the client closes the connection,
         // and the 'finish' event is fired when KafkaSSE closes the connection (due to an error).
-        // Regsiter them both.
+        // Register them both.
         res.on('close', decrementConnectionCount);
         res.on('finish', decrementConnectionCount);
 
@@ -458,4 +457,3 @@ module.exports = async (app) => {
         router
     };
 };
-

@@ -1,5 +1,6 @@
+# syntax=docker-registry.wikimedia.org/repos/releng/blubber:v0.17.0
 version: v4
-base: docker-registry.wikimedia.org/nodejs10-slim
+base: docker-registry.wikimedia.org/nodejs18-slim
 lives:
   in: /srv/service
 runs:
@@ -7,32 +8,31 @@ runs:
 
 variants:
   build:
-    base: docker-registry.wikimedia.org/nodejs10-devel
+    base: docker-registry.wikimedia.org/nodejs18-devel
     copies: [local]
-    apt: { packages: [git, build-essential, python-pkgconfig, librdkafka-dev] }
+    apt: { packages: [git, build-essential] }
     node:
       requirements: [package.json]
     builder:
       requirements: [ui/]
-      command: [npm, run, build-ui]
+      command: [/usr/bin/npm, run, build-ui]
     runs:
       environment:
-        BUILD_LIBRDKAFKA: "0"
         LINK: g++
   test:
     includes: [build]
     apt: { packages: [ca-certificates] }
-    entrypoint: [npm, test]
+    entrypoint: [/usr/bin/npm, test]
   development:
     includes: [build]
-    apt: { packages: [ca-certificates, librdkafka1, librdkafka++1, tcpdump, kafkacat, telnet, iputils-ping, procps, curl, vim] }
-    entrypoint: [node, server.js]
+    apt: { packages: [ca-certificates, tcpdump, kafkacat, telnet, iputils-ping, procps, curl, vim] }
+    entrypoint: [/usr/bin/node, server.js]
   prep:
     includes: [build]
     node: { env: production }
   production:
     copies: [prep]
-    apt: { packages: [ca-certificates, wmf-certificates, librdkafka1, librdkafka++1] }
+    apt: { packages: [ca-certificates, wmf-certificates] }
     node: { env: production }
     runs: { environment: { UV_THREADPOOL_SIZE: "128" } }
-    entrypoint: [node, server.js]
+    entrypoint: [/usr/bin/node, server.js]

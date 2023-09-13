@@ -51,7 +51,7 @@ It allows to copy the text to the clipboard by clicking a button.
   import VueJsonPretty from 'vue-json-pretty';
   import 'vue-json-pretty/lib/styles.css';
   import Utils from '@/utils';
-  import YAML from 'yamljs';
+  import 'yaml';
 
   export default {
     name: 'EventDetail',
@@ -79,7 +79,7 @@ It allows to copy the text to the clipboard by clicking a button.
         return JSON.stringify(this.jsonData, null, 2) + '\n';
       },
       yamlText: function () {
-        return YAML.stringify(this.jsonData, 10, 2);
+        return yaml.stringify(this.jsonData, 10, 2);
       },
       yamlHtml: function () {
         return Utils.yamlToHtml(this.yamlText);

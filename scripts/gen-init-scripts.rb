@@ -45,7 +45,7 @@ class ScriptData
   end
 
   def read_info root_dir
-    data = YAML.load(File.read(File.join(root_dir, 'config.yaml')))['services'][0]['conf']
+    data = yaml.load(File.read(File.join(root_dir, 'config.yaml')))['services'][0]['conf']
     return data.merge(JSON.load(File.read(File.join(root_dir, 'package.json'))))
   end
 
@@ -68,4 +68,3 @@ end
 data = ScriptData.new indir
 data.set_info rootdir
 data.generate outdir
-

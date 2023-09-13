@@ -12,12 +12,17 @@
     "vue": "^2.6.11",
     "vue-json-pretty": "^1.7.1",
     "vue-router": "^3.2.0",
-    "yamljs": "^0.3.0"
+    "yaml": "^2.3.2"
+  },
+  "browser": {
+    "fs": false,
+    "os": false,
+    "path": false
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-router": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
+    "@vue/cli-plugin-babel": "^5.0.8",
+    "@vue/cli-plugin-router": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
     "babel-plugin-component": "^1.1.1",
     "vue-template-compiler": "^2.6.11"
   },

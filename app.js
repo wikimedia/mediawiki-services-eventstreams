@@ -35,7 +35,8 @@ function initApp(options) {
     // ensure some sane defaults
     app.conf.port = app.conf.port || 8888;
     app.conf.interface = app.conf.interface || '0.0.0.0';
-    app.conf.compression_level = app.conf.compression_level === undefined ? 3 : app.conf.compression_level;
+    app.conf.compression_level =
+      app.conf.compression_level === undefined ? 3 : app.conf.compression_level;
     app.conf.cors = app.conf.cors === undefined ? '*' : app.conf.cors;
     if (app.conf.csp === undefined) {
         app.conf.csp = "default-src 'self'; object-src 'none'; media-src *; img-src *; style-src *; frame-ancestors 'self'";
@@ -136,6 +137,7 @@ function initApp(options) {
 
 /**
  * Loads all routes declared in routes/ into the app
+ *
  * @param {Application} app the application object to load routes into
  * @param {string} dir routes folder
  * @return {bluebird} a promise resolving to the app object
@@ -189,6 +191,7 @@ function loadRoutes(app, dir) {
 
 /**
  * Creates and start the service's web server
+ *
  * @param {Application} app the app object to use in the service
  * @return {bluebird} a promise creating the web server
  */
