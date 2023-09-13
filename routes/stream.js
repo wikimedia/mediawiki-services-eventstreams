@@ -291,7 +291,7 @@ module.exports = async (app) => {
             staticLabels: { service: app.metrics.getServiceName() },
         },
         labels: {
-            names: ['stream', 'client_ip'],
+            names: ['stream'],
             omitLabelNames: true,
         }
     });
@@ -322,7 +322,9 @@ module.exports = async (app) => {
     const connectionCountPerIp = {};
 
     router.get('/stream/:streams', (req, res) => {
-        const clientIp = req.headers['x-client-ip'] || 'UNKNOWN';
+        const clientIp = req.get('x-client-ip') || 'UNKNOWN';
+        const userAgent = req.get('user-agent') || 'UNKNOWN';
+        const referer = req.get('referer') || 'UNKNOWN';
 
         // ensure the requesting client hasn't gone over the concurrent connection limits.
         if (app.conf.client_ip_connection_limit) {
@@ -386,7 +388,8 @@ module.exports = async (app) => {
         requestedStreams.forEach((stream) => {
             // Increment the number of current connections for this stream using this key.
             // NOTE: This is a guage so we have to decrement it when the client is disconnected too.
-            connectedClientsMetric.increment(1, [stream, clientIp]);
+            connectedClientsMetric.increment(1, [stream]);
+            app.logger.log('info', `Connected: IP ${clientIp}, User-Agent: ${userAgent}, Referer: ${referer}, stream ${stream}`);
         });
         // Increment the total counter of clients ever connected to this combination of streams.
         clientConnectionsTotalMetric.increment(1, [requestedStreams.sort().join(',')]);
@@ -397,9 +400,9 @@ module.exports = async (app) => {
         // After the connection is closed, decrement the number
         // of current connections for these streams.
         function decrementConnectionCount() {
-            app.logger.log('debug/stats', `Decrementing connection counters for ${clientIp}`);
             requestedStreams.forEach((stream) => {
-                connectedClientsMetric.decrement(1, [stream, clientIp]);
+                app.logger.log('info', `Disconnected: IP ${clientIp}, User-Agent: ${userAgent}, Referer: ${referer}, stream ${stream}`);
+                connectedClientsMetric.decrement(1, [stream]);
             });
             // Decrement the number of concurrent connections for this client ip
             // (never going below 0).
