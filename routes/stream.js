@@ -359,9 +359,9 @@ module.exports = async (app) => {
             });
         }
 
-        const topics = _.uniq([].concat(_.map(
+        const topics = _.uniq(_.flatMap(
             _.pick(streamConfigs, requestedStreams),
-            (streamConfig) => streamConfig.topics)
+            (streamConfig) => streamConfig.topics
         ));
 
         // If since param is provided, it will be used to consume from
