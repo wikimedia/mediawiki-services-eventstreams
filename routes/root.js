@@ -45,8 +45,6 @@ router.get('/', (req, res, next) => {
         } else {
             res.redirect(303, '/?doc');
         }
-        // === End EventStreams modification ===
-        next();
     }
 
 });
