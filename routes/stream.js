@@ -430,10 +430,11 @@ module.exports = async (app) => {
                 // eslint-disable-next-line no-underscore-dangle
                 logger:                 req.logger._logger,
                 kafkaConfig:            app.conf.kafka,
-                // Use the eventstreams custom deserializer to include
+                // Use the eventstreams custom redactor to include
                 // kafka message meta data in the deserialized message.meta object
-                // that will be sent to the client as an event.
-                deserializer:           eUtil.deserializer
+                // that will be sent to the client as an event and redact actor
+                // actor signatures on sensitive pages
+                deserializer:           eUtil.redactor
             },
             atTimestamp
         );
