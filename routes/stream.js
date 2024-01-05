@@ -59,6 +59,8 @@ const router = sUtil.router();
  * @param {Array<string>} app.conf.schema_base_uris
  *  If provided, relative $schema urls for a stream will attempt to be resolved from these.
  * @param {Object} app.conf.schema_uri_options
+ *  If provided, redacts user from these pages on ruwiki.
+ * @param {Object} app.conf.mediawiki_redacted_pages
  */
 async function loadStreamConfigs(app) {
     let streamConfigs;
@@ -321,6 +323,14 @@ module.exports = async (app) => {
     // Keep track of currently connected client IPs for poor-man's rate limiting.
     const connectionCountPerIp = {};
 
+    // see if redactor is enabled, and if so set it
+    let deserializer;
+    if (app.conf.mediawiki_redacted_pages) {
+        deserializer = eUtil.makeMediaWikiRedactorDeserializer(app.conf.mediawiki_redacted_pages);
+    } else {
+        deserializer = eUtil.deserializer;
+    }
+
     router.get('/stream/:streams', (req, res) => {
         const clientIp = req.get('x-client-ip') || 'UNKNOWN';
         const userAgent = req.get('user-agent') || 'UNKNOWN';
@@ -433,7 +443,7 @@ module.exports = async (app) => {
                 // Use the eventstreams custom deserializer to include
                 // kafka message meta data in the deserialized message.meta object
                 // that will be sent to the client as an event.
-                deserializer:           eUtil.deserializer
+                deserializer:           deserializer
             },
             atTimestamp
         );

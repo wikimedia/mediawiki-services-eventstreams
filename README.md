@@ -69,3 +69,11 @@ Stream configuration found at `stream_config_uri` can be used to build a dynamic
 EventStreams app config is combined with stream config settings to augment the spec
 with request description, response schema and response examples.
 config.yaml documentents how stream config settings are used to do this.
+
+## Page redaction manual testing
+For reasons of safety, some actor/performer/user information may be redacted. A list of the relevant
+pages is maintained in the [deployment-charts](https://gerrit.wikimedia.org/r/plugins/gitiles/operations/deployment-charts/+/refs/heads/master/helmfile.d/services/eventstreams/values.yaml)
+repository. You can test this functionality manually by making an edit to a test page hosted on ruwiki,
+[Участник:HTriedman (WMF)/redacted page test](https://ru.wikipedia.org/wiki/%D0%A3%D1%87%D0%B0%D1%81%D1%82%D0%BD%D0%B8%D0%BA:HTriedman_(WMF)/redacted_page_test).
+Then query the eventstream history for that revision and manually verify that no actor/performer/user 
+information is present in the revision information.
