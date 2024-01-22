@@ -47,7 +47,7 @@ describe('eventstream-util', () => {
             it('should redact ruwiki mediawiki.page_change.v1 message correctly', () => {
                 const redactPage = createKafkaMessage({ wiki_id: 'ruwiki' });
 
-                const redactor = makeMediaWikiRedactorDeserializer(['redact']);
+                const redactor = makeMediaWikiRedactorDeserializer({ ruwiki: ['redact'] });
                 const { message: redactedPage } = redactor(redactPage);
 
                 // Performer is required by the schema but its properties aren't.
@@ -67,7 +67,7 @@ describe('eventstream-util', () => {
                     },
                 });
 
-                const redactor = makeMediaWikiRedactorDeserializer(['no redact']);
+                const redactor = makeMediaWikiRedactorDeserializer({ ruwiki: ['no redact'] });
                 const { message: redactedPage } = redactor(redactPage);
 
                 assert.ok(redactedPage.performer.user_id);
@@ -95,7 +95,7 @@ describe('eventstream-util', () => {
             it('should redact ruwiki mediawiki.recentchange message correctly', () => {
                 const redactPage = createKafkaMessage({ wiki: 'ruwiki' });
 
-                const redactor = makeMediaWikiRedactorDeserializer(['redact']);
+                const redactor = makeMediaWikiRedactorDeserializer({ ruwiki: ['redact'] });
                 const { message: redactedPage } = redactor(redactPage);
 
                 assert.ok(!redactedPage?.user);
@@ -107,7 +107,7 @@ describe('eventstream-util', () => {
                     title: 'no redact'
                 });
 
-                const redactor = makeMediaWikiRedactorDeserializer(['no redact']);
+                const redactor = makeMediaWikiRedactorDeserializer({ ruwiki: ['no redact'] });
                 const { message: redactedPage } = redactor(redactPage);
 
                 assert.ok(redactedPage.user);
@@ -128,7 +128,7 @@ describe('eventstream-util', () => {
 
             it('should redact ruwiki database message correctly', () => {
                 const redactPage = createKafkaMessage({ database: 'ruwiki' });
-                const redactor = makeMediaWikiRedactorDeserializer(['redact']);
+                const redactor = makeMediaWikiRedactorDeserializer({ ruwiki: ['redact'] });
                 const { message: redactedPage } = redactor(redactPage);
 
                 assert.ok(!redactedPage?.performer);
@@ -139,7 +139,7 @@ describe('eventstream-util', () => {
                     page_title: 'no redact',
                     database: 'jawiki',
                 });
-                const redactor = makeMediaWikiRedactorDeserializer(['no redact']);
+                const redactor = makeMediaWikiRedactorDeserializer({ ruwiki: ['no redact'] });
                 const { message: redactedPage } = redactor(redactPage);
 
                 assert.ok(redactedPage.performer);

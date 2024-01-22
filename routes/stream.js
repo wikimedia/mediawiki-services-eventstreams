@@ -59,8 +59,8 @@ const router = sUtil.router();
  * @param {Array<string>} app.conf.schema_base_uris
  *  If provided, relative $schema urls for a stream will attempt to be resolved from these.
  * @param {Object} app.conf.schema_uri_options
- *  If provided, redacts user from these pages on ruwiki.
- * @param {Object} app.conf.mediawiki_redacted_pages
+ *  If provided, redacts user from these pages. Map of wiki to pages to redact.
+ * @param {Object<string, Array<string>>} app.conf.mediawiki_redacted_pages
  */
 async function loadStreamConfigs(app) {
     let streamConfigs;
