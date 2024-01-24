@@ -144,6 +144,14 @@ describe('eventstream-util', () => {
 
                 assert.ok(redactedPage.performer);
             });
+
+            it('should redact titles with spaces correctly', () => {
+                const redactPage = createKafkaMessage({ database: 'ruwiki', page_title: 'redact_this' });
+                const redactor = makeMediaWikiRedactorDeserializer({ ruwiki: ['redact this'] });
+                const { message: redactedPage } = redactor(redactPage);
+
+                assert.ok(!redactedPage?.performer);
+            });
         });
     });
 });
