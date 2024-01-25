@@ -18,7 +18,7 @@ describe('eventstream-util', () => {
             before(() => {
                 createKafkaMessage = createKafkaMessageWithDefaults({
                     meta: {
-                        stream: 'mediawiki.page_change.v1',
+                        stream: 'mediawiki.page_change.v1'
                     },
                     page: {
                         page_title: 'redact'
@@ -44,10 +44,10 @@ describe('eventstream-util', () => {
                 });
             });
 
-            it('should redact ruwiki mediawiki.page_change.v1 message correctly', () => {
-                const redactPage = createKafkaMessage({ wiki_id: 'ruwiki' });
+            it('should redact mediawiki.page_change.v1 message correctly', () => {
+                const redactPage = createKafkaMessage({ meta: { domain: 'test.domain' } });
 
-                const redactor = makeMediaWikiRedactorDeserializer({ ruwiki: ['redact'] });
+                const redactor = makeMediaWikiRedactorDeserializer({ 'test.domain': ['redact'] });
                 const { message: redactedPage } = redactor(redactPage);
 
                 // Performer is required by the schema but its properties aren't.
@@ -61,13 +61,13 @@ describe('eventstream-util', () => {
 
             it('should not redact mediawiki.page_change.v1 message correctly', () => {
                 const redactPage = createKafkaMessage({
-                    wiki_id: 'jawiki',
+                    meta: { domain: 'other.domain' },
                     page: {
                         page_title: 'no redact'
                     },
                 });
 
-                const redactor = makeMediaWikiRedactorDeserializer({ ruwiki: ['no redact'] });
+                const redactor = makeMediaWikiRedactorDeserializer({ 'test.domain': ['no redact'] });
                 const { message: redactedPage } = redactor(redactPage);
 
                 assert.ok(redactedPage.performer.user_id);
@@ -92,10 +92,10 @@ describe('eventstream-util', () => {
                 });
             });
 
-            it('should redact ruwiki mediawiki.recentchange message correctly', () => {
-                const redactPage = createKafkaMessage({ wiki: 'ruwiki' });
+            it('should redact mediawiki.recentchange message correctly', () => {
+                const redactPage = createKafkaMessage({ meta: { domain: 'test.domain' } });
 
-                const redactor = makeMediaWikiRedactorDeserializer({ ruwiki: ['redact'] });
+                const redactor = makeMediaWikiRedactorDeserializer({ 'test.domain': ['redact'] });
                 const { message: redactedPage } = redactor(redactPage);
 
                 assert.ok(!redactedPage?.user);
@@ -103,11 +103,11 @@ describe('eventstream-util', () => {
 
             it('should not redact mediawiki.recentchange message correctly', () => {
                 const redactPage = createKafkaMessage({
-                    wiki: 'jawiki',
+                    meta: { domain: 'other.domain' },
                     title: 'no redact'
                 });
 
-                const redactor = makeMediaWikiRedactorDeserializer({ ruwiki: ['no redact'] });
+                const redactor = makeMediaWikiRedactorDeserializer({ 'test.domain': ['no redact'] });
                 const { message: redactedPage } = redactor(redactPage);
 
                 assert.ok(redactedPage.user);
@@ -126,28 +126,28 @@ describe('eventstream-util', () => {
                 });
             });
 
-            it('should redact ruwiki database message correctly', () => {
-                const redactPage = createKafkaMessage({ database: 'ruwiki' });
-                const redactor = makeMediaWikiRedactorDeserializer({ ruwiki: ['redact'] });
+            it('should redact other performer fragments correctly', () => {
+                const redactPage = createKafkaMessage({ meta: { domain: 'test.domain' } });
+                const redactor = makeMediaWikiRedactorDeserializer({ 'test.domain': ['redact'] });
                 const { message: redactedPage } = redactor(redactPage);
 
                 assert.ok(!redactedPage?.performer);
             });
 
-            it('should not redact other database message correctly', () => {
+            it('should not redact other performer fragments correctly', () => {
                 const redactPage = createKafkaMessage({
                     page_title: 'no redact',
-                    database: 'jawiki',
+                    meta: { domain: 'other.domain' }
                 });
-                const redactor = makeMediaWikiRedactorDeserializer({ ruwiki: ['no redact'] });
+                const redactor = makeMediaWikiRedactorDeserializer({ 'test.domain': ['redact this'] });
                 const { message: redactedPage } = redactor(redactPage);
 
                 assert.ok(redactedPage.performer);
             });
 
             it('should redact titles with spaces correctly', () => {
-                const redactPage = createKafkaMessage({ database: 'ruwiki', page_title: 'redact_this' });
-                const redactor = makeMediaWikiRedactorDeserializer({ ruwiki: ['redact this'] });
+                const redactPage = createKafkaMessage({ meta: { domain: 'test.domain' }, page_title: 'redact_this' });
+                const redactor = makeMediaWikiRedactorDeserializer({ 'test.domain': ['redact this'] });
                 const { message: redactedPage } = redactor(redactPage);
 
                 assert.ok(!redactedPage?.performer);
