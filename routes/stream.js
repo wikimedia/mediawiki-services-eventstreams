@@ -323,14 +323,6 @@ module.exports = async (app) => {
     // Keep track of currently connected client IPs for poor-man's rate limiting.
     const connectionCountPerIp = {};
 
-    // see if redactor is enabled, and if so set it
-    let deserializer;
-    if (app.conf.mediawiki_redacted_pages) {
-        deserializer = eUtil.makeMediaWikiRedactorDeserializer(app.conf.mediawiki_redacted_pages);
-    } else {
-        deserializer = eUtil.deserializer;
-    }
-
     router.get('/stream/:streams', (req, res) => {
         const clientIp = req.get('x-client-ip') || 'UNKNOWN';
         const userAgent = req.get('user-agent') || 'UNKNOWN';
@@ -423,6 +415,17 @@ module.exports = async (app) => {
         // Register them both.
         res.on('close', decrementConnectionCount);
         res.on('finish', decrementConnectionCount);
+
+        // See if redactor is enabled, and if so set it.
+        // This is router.get so we have access to clientIp and userAgent.
+        let deserializer;
+        if (app.conf.mediawiki_redacted_pages) {
+            deserializer = eUtil.makeMediaWikiRedactorDeserializer(
+                app.conf.mediawiki_redacted_pages, { logger: app.logger, clientIp, userAgent }
+            );
+        } else {
+            deserializer = eUtil.deserializer;
+        }
 
         // Start the SSE EventStream connection with topics.
         return kafkaSse(req, res, topics,

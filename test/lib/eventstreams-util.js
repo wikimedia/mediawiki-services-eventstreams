@@ -6,6 +6,7 @@ const { makeMediaWikiRedactorDeserializer } = require('../../lib/eventstreams-ut
 
 /**
  * Creates a helper function to make kafka messages with default values
+ *
  * @param {Object} defaults
  * @return {function(Object): {value: string}}
  */
@@ -18,7 +19,8 @@ describe('eventstream-util', () => {
             before(() => {
                 createKafkaMessage = createKafkaMessageWithDefaults({
                     meta: {
-                        stream: 'mediawiki.page_change.v1'
+                        stream: 'mediawiki.page_change.v1',
+                        domain: 'test.domain'
                     },
                     page: {
                         page_title: 'redact'
@@ -44,19 +46,27 @@ describe('eventstream-util', () => {
                 });
             });
 
-            it('should redact mediawiki.page_change.v1 message correctly', () => {
-                const redactPage = createKafkaMessage({ meta: { domain: 'test.domain' } });
-
-                const redactor = makeMediaWikiRedactorDeserializer({ 'test.domain': ['redact'] });
-                const { message: redactedPage } = redactor(redactPage);
-
+            const assertRedactedPageChange = (redacted_page) => {
                 // Performer is required by the schema but its properties aren't.
-                assert.ok(redactedPage.performer);
-                assert.ok(!redactedPage.performer?.user_id);
-                assert.ok(!redactedPage.performer?.user_text);
+                assert.ok(redacted_page.performer);
+                assert.ok(!redacted_page.performer?.user_id);
+                assert.ok(!redacted_page.performer?.user_text);
 
-                assert.ok(!redactedPage.revision?.editor);
-                assert.ok(!redactedPage.prior_state.revision?.editor);
+                assert.ok(!redacted_page.revision?.editor);
+                assert.ok(!redacted_page.prior_state.revision?.editor);
+            };
+
+            it('should redact mediawiki.page_change.v1 message correctly', () => {
+                const redactPage1 = createKafkaMessage();
+                const redactPage2 = createKafkaMessage({
+                    page: { page_title: 'redact_this' }
+                });
+
+                const redactor = makeMediaWikiRedactorDeserializer({ 'test.domain': ['redact', 'Redact this'] });
+                const { message: redactedPage1 } = redactor(redactPage1);
+                const { message: redactedPage2 } = redactor(redactPage2);
+                assertRedactedPageChange(redactedPage1);
+                assertRedactedPageChange(redactedPage2);
             });
 
             it('should not redact mediawiki.page_change.v1 message correctly', () => {
@@ -84,6 +94,7 @@ describe('eventstream-util', () => {
                 createKafkaMessage = createKafkaMessageWithDefaults({
                     meta: {
                         stream: 'mediawiki.recentchange',
+                        domain: 'test.domain'
                     },
                     title: 'redact',
                     user: {
@@ -93,12 +104,15 @@ describe('eventstream-util', () => {
             });
 
             it('should redact mediawiki.recentchange message correctly', () => {
-                const redactPage = createKafkaMessage({ meta: { domain: 'test.domain' } });
+                const redactPage1 = createKafkaMessage();
+                const redactPage2 = createKafkaMessage({ title: 'redact this' });
 
-                const redactor = makeMediaWikiRedactorDeserializer({ 'test.domain': ['redact'] });
-                const { message: redactedPage } = redactor(redactPage);
+                const redactor = makeMediaWikiRedactorDeserializer({ 'test.domain': ['redact', 'Redact this'] });
+                const { message: redactedPage1 } = redactor(redactPage1);
+                const { message: redactedPage2 } = redactor(redactPage2);
 
-                assert.ok(!redactedPage?.user);
+                assert.ok(!redactedPage1?.user);
+                assert.ok(!redactedPage2?.user);
             });
 
             it('should not redact mediawiki.recentchange message correctly', () => {
@@ -152,6 +166,47 @@ describe('eventstream-util', () => {
 
                 assert.ok(!redactedPage?.performer);
             });
+        });
+
+        context('edge cases', () => {
+            const createKafkaMessage = createKafkaMessageWithDefaults();
+
+            const testCases = [
+                {
+                    title: 'should not fail on empty message',
+                    message: {}
+                },
+                {
+                    title: 'should not fail on no title',
+                    message: { meta: { domain: 'test.domain' } }
+                },
+                {
+                    title: 'should parse boolean page title',
+                    message: {
+                        meta: { domain: 'test.domain', stream: 'mediawiki.recentchange' },
+                        title: 'false', user: {}
+                    },
+                    redacted: true
+                },
+                {
+                    title: 'should parse number page title',
+                    message: {
+                        meta: { domain: 'test.domain', stream: 'mediawiki.page_change.v1' },
+                        page: { page_title: '404' }, revision: { editor: {} }
+                    },
+                    redacted: true
+                },
+            ];
+
+            const redactor = makeMediaWikiRedactorDeserializer({ 'test.domain': ['redact', 'Redact this', 404, false] });
+
+            testCases.forEach(({ title, message, redacted }) => {
+                it(title, () => {
+                    const { message: redactedPage } = redactor(createKafkaMessage(message));
+                    assert.ok(_.isMatch(redactedPage, message) !== !!redacted);
+                });
+            });
+
         });
     });
 });
