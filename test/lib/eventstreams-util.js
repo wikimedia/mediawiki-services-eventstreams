@@ -10,7 +10,16 @@ const { makeMediaWikiRedactorDeserializer } = require('../../lib/eventstreams-ut
  * @param {Object} defaults
  * @return {function(Object): {value: string}}
  */
-const createKafkaMessageWithDefaults = (defaults) => (override_values) => ({ value: JSON.stringify(_.merge(defaults, override_values)) });
+const createKafkaMessageWithDefaults = (defaults) => (override_values) => (
+    {
+        value: JSON.stringify(_.merge(defaults, override_values)),
+        topic: '',
+        partition: 0,
+        offset: 0,
+        timestamp: null,
+        key: null
+    }
+);
 
 describe('eventstream-util', () => {
     context('makeMediaWikiRedactorDeserializer', () => {
@@ -202,11 +211,14 @@ describe('eventstream-util', () => {
 
             testCases.forEach(({ title, message, redacted }) => {
                 it(title, () => {
-                    const { message: redactedPage } = redactor(createKafkaMessage(message));
-                    assert.ok(_.isMatch(redactedPage, message) !== !!redacted);
+                    const redactedPage = redactor(createKafkaMessage(message));
+                    assert.ok(_.isMatch(redactedPage.message, message) !== !!redacted);
+                    assert.ok(_.has(redactedPage, 'topic'));
+                    assert.ok(_.has(redactedPage, 'offset'));
+                    assert.ok(_.has(redactedPage, 'partition'));
+                    assert.ok(_.has(redactedPage, 'key'));
                 });
             });
-
         });
     });
 });
