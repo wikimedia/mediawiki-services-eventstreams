@@ -421,7 +421,7 @@ module.exports = async (app) => {
         let deserializer;
         if (app.conf.mediawiki_redacted_pages) {
             deserializer = eUtil.makeMediaWikiRedactorDeserializer(
-                app.conf.mediawiki_redacted_pages, { logger: app.logger, clientIp, userAgent }
+                app.conf.mediawiki_redacted_pages, { logger: app.logger, clientIp, userAgent, referer }
             );
         } else {
             deserializer = eUtil.deserializer;
