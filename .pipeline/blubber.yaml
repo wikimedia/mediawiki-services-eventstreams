@@ -1,4 +1,4 @@
-# syntax=docker-registry.wikimedia.org/repos/releng/blubber:v0.17.0
+# syntax=docker-registry.wikimedia.org/repos/releng/blubber/buildkit:v0.23.0
 version: v4
 base: docker-registry.wikimedia.org/nodejs18-slim
 lives:
